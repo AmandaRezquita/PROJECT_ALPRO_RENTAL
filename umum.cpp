@@ -497,22 +497,6 @@ void menuFilterBarang()
     jedaTampilan();
 }
 
-void bubbleSortNama(bool ascending)
-{
-    for (int i = 0; i < jumlahBarang - 1; i++)
-    {
-        for (int j = 0; j < jumlahBarang - i - 1; j++)
-        {
-            if ((ascending && daftarBarang[j].nama > daftarBarang[j + 1].nama) ||
-                (!ascending && daftarBarang[j].nama < daftarBarang[j + 1].nama))
-            {
-                Barang temp = daftarBarang[j];
-                daftarBarang[j] = daftarBarang[j + 1];
-                daftarBarang[j + 1] = temp;
-            }
-        }
-    }
-}
 void bubbleSortHarga(bool ascending)
 {
     for (int i = 0; i < jumlahBarang - 1; i++)
@@ -534,80 +518,79 @@ void menuSortirBarang()
 {
     int key;
     int pilihSortir = 0;
-    const int TOTAL_MENU = 5;
-
+    const int TOTAL_MENU = 3; 
+    
+    string menu[] = {
+        "Harga Termurah -> Termahal ", 
+        "Harga Termahal -> Termurah ", 
+        "Kembali"
+    };
+    
     do
     {
         bersihkanLayar();
+        cout << "\n";
+        cout << "   -----------------------------------------------\n";
+        cout << "   |           S O R T I R  B A R A N G           |\n";
+        cout << "   -----------------------------------------------\n";
         cout << endl;
-        tampilkanVespa();
-        cout << '\n';
-        cout << "     ===========================================================\n";
-        cout << "                       S O R T I R   B A R A N G\n";
-        cout << "     ===========================================================\n";
-
-        string menu[] = {
-            "Harga Termurah -> Termahal ",
-            "Harga Termahal -> Termurah ",
-            "Nama A -> Z ",
-            "Nama Z -> A ",
-            "Kembali"};
-
         for (int i = 0; i < TOTAL_MENU; i++)
         {
-            cout << endl;
-            cout << '\t' << "     ";
-            if (i == pilihSortir)
-                cout << "\033[36m>> " << menu[i] << "\033[0m" << endl;
-            else
-                cout << "   " << menu[i] << endl;
+            if (i == pilihSortir) {
+                cout << "\t    \033[36m>> " << menu[i] << "\033[0m" << endl;
+                cout << endl;
+            } else {
+                cout << "\t       " << menu[i] << endl;
+                cout << endl;
+            }
         }
+        key = _getch(); 
 
-        key = _getch();
-        if (key == 224)
+        if (key == 224) 
         {
-            key = _getch();
-            if (key == 72)
-                pilihSortir = (pilihSortir == 0) ? TOTAL_MENU - 1 : pilihSortir - 1;
-            else if (key == 80)
+            key = _getch(); 
+            if (key == 72) 
+                pilihSortir = (pilihSortir == 0) ? TOTAL_MENU - 1 : pilihSortir - 1; 
+            else if (key == 80) 
                 pilihSortir = (pilihSortir == TOTAL_MENU - 1) ? 0 : pilihSortir + 1;
         }
-    } while (key != 13);
+        
+    } while (key != 13); 
 
-    if (pilihSortir == 4)
-        return;
+    
     switch (pilihSortir)
     {
-    case 0:
-        bubbleSortHarga(true);
-        break;
-    case 1:
-        bubbleSortHarga(false);
-        break;
-    case 2:
-        bubbleSortNama(true);
-        break;
-    case 3:
-        bubbleSortNama(false);
-        break;
+        case 0:
+            bubbleSortHarga(true);  
+            break;
+        case 1:
+            bubbleSortHarga(false); 
+            break;
+        case 2:
+            return; 
     }
+
+ 
     bersihkanLayar();
-    cout << "\n     ==================== HASIL SORTIR ====================\n\n";
-    if (jumlahBarang == 0)
-    {
+    cout << "\n";
+    cout << "   -----------------------------------------------\n";
+    cout << "   |          H A S I L  S O R T I R              \n";
+    cout << "   -----------------------------------------------\n";
+    if (jumlahBarang == 0) {
         cout << "\t     [ Tidak ada kendaraan yang tersedia ]\n";
-    }
-    else
-    {
+    } else {
         for (int i = 0; i < jumlahBarang; i++)
         {
-            cout << "\t[" << i + 1 << "] " << daftarBarang[i].nama << endl;
-            cout << "\t   Harga     : Rp " << daftarBarang[i].harga << " / hari" << endl;
-            cout << "\t   Deskripsi : \n\t   " << daftarBarang[i].deskripsi << endl;
-            cout << "\t ---------------------------------------------------\n";
+   cout << "\n   " << i + 1 << ". Nama       : " << daftarBarang[i].nama << endl;
+    cout << "\n      Harga      : Rp" << daftarBarang[i].harga << endl;
+    cout << "\n      Status     : " << (daftarBarang[i].available ? "Tersedia" : "Sedang Disewa") << endl;
+    cout << "\n      Deskripsi  : " << daftarBarang[i].deskripsi << endl;
+    cout << "\n      " << BLUE << "\033]8;;" << daftarBarang[i].url << "\033\\Foto Produk\033]8;;\033\\" << RESET << endl;
+    cout << "\n   -----------------------------------------------" << endl;
         }
     }
-    jedaTampilan();
+
+    jedaTampilan(); 
 }
 
 int main()
