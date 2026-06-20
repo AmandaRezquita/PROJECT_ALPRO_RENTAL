@@ -14,13 +14,56 @@ struct Account
     string password;
 };
 
+struct Barang
+{
+    string url;
+    string nama;
+    int harga;
+    string deskripsi;
+    bool available;
+};
+
 Account admin[1];
 Account user[MAX];
+Barang daftarBarang[MAX];
 int jumlahUser = 2;
 int pilihMenu = 0;
-int yesorno;
+int jumlahBarang = 0;
+int edit;
+char yesorno;
+string tempJenis, tempMerk, tempDeskripsi;
 
 void dashboardAdmin();
+void kelolaBarang();
+void createBarang();
+void readBarang();
+void updateBarang();
+void deleteBarang();
+
+void inisialisasiDummyData()
+{
+    if (jumlahBarang == 0)
+    {
+        daftarBarang[0] = {
+            "https://kenh14cdn.com/203336854389633024/2022/11/28/photo-17-1669604198602829180940.jpg",
+            "Vario",
+            150000,
+            "Jenis     : Motor\n"
+            "                   Merk      : Honda\n"
+            "                   Catatan   : Tes",
+            true};
+
+        daftarBarang[1] = {
+            "https://www.honda.ca/-/media/Brands/Honda/Models/CR-V/2026/04-Trims/BAP/EX-L/SRSM/MY26_CR-V_EXL_AWD_SRSM_3250x2400_Desktop_BAPColourSelector_01.png",
+            "CRV",
+            250000,
+            "Jenis     : Mobil\n"
+            "                   Merk      : Honda\n"
+            "                   Catatan   : Tes",
+            true};
+        jumlahBarang = 2;
+    }
+}
 
 void clearBuffer()
 {
@@ -170,7 +213,6 @@ void loginUser()
         cout << '\t' << "     ";
         cout << BLUE << "[Login Berhasil!]\n"
              << RESET << endl;
-        dashboardAdmin();
     }
     else
     {
@@ -201,7 +243,7 @@ void registrasi()
     {
         cout << endl;
         cout << '\t' << "     ";
-        cout << "Username sudah terdaftar!\n";
+        cout << "[Username sudah terdaftar!]\n";
     }
     else
     {
@@ -327,6 +369,7 @@ void menuUtama()
 
 int main()
 {
+    inisialisasiDummyData();
     dataAwal();
     menuUtama();
     return 0;
