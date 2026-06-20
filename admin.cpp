@@ -88,7 +88,7 @@ void readBarang()
     }
     else if (subPilih == 2)
     {
-        // fungsi sortir
+        menuSortirBarang();
     }
     else
     {
