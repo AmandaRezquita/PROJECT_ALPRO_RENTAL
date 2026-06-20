@@ -1,5 +1,4 @@
 #include "admin.cpp"
-
 using namespace std;
 
 struct Transaksi
@@ -25,6 +24,41 @@ int hitungHari(int h, int b, int t)
     return h + (b * 30) + (t * 365);
 }
 
+void prosesPembayaran(Transaksi t) {
+    double uangDibayar, kembalian;
+    bool pembayaranBerhasil = false;
+
+    bersihkanLayar();
+    cout << "\n   -----------------------------------------------\n";
+    cout << "   |              MENU PEMBAYARAN                |\n";
+    cout << "   -----------------------------------------------\n";
+    cout << "   Total Tagihan : Rp " << t.totalBayar << endl;
+    cout << "   -----------------------------------------------\n";
+
+    do {
+        cout << "   Masukkan jumlah uang pembayaran : Rp ";
+        cin >> uangDibayar;
+
+        if (uangDibayar >= t.totalBayar) {
+            kembalian = uangDibayar - t.totalBayar;
+            pembayaranBerhasil = true; 
+        } else {
+            cout << "   [Error] Uang tidak cukup! Kekurangan: Rp " 
+                 << (t.totalBayar - uangDibayar) << endl;
+            cout << "   Silakan masukkan jumlah yang benar.\n" << endl;
+        }
+    } while (!pembayaranBerhasil);
+
+    cout << "   -----------------------------------------------\n";
+    cout << "   Status        : Pembayaran Berhasil!" << endl;
+    cout << "   Kembalian     : Rp " << kembalian << endl;
+    cout << "   -----------------------------------------------\n";
+    cout << "\n   Transaksi selesai. Terima kasih!" << endl; 
+
+    lanjutTampilan();
+
+}
+
 void cetakNota(Transaksi t)
 {
     bersihkanLayar();
@@ -38,7 +72,9 @@ void cetakNota(Transaksi t)
     cout << "   Durasi        : " << t.totalDurasi << " Hari" << endl;
     cout << "   Total Tagihan : Rp " << t.totalBayar << endl;
     cout << "   -----------------------------------------------\n";
-    cout << "\n   Lanjutkan ke pembayaran...\n";
+    cout << "\n   Silahkan lanjutkan ke pembayaran\n";
+
+    lanjutTampilan();
 }
 
 void prosesPesanan(string namaUser, Barang b)
@@ -48,47 +84,42 @@ void prosesPesanan(string namaUser, Barang b)
     t.barang = b.nama;
     t.kode = "TRX-" + namaUser.substr(0, 2);
 
-   
     time_t now = time(0);
     tm *ltm = localtime(&now);
 
     t.hariAwal = ltm->tm_mday;
     t.bulanAwal = 1 + ltm->tm_mon;
     t.tahunAwal = 1900 + ltm->tm_year;
-   
 
     bersihkanLayar();
     cout << "\n   -----------------------------------------------\n";
-    cout << "   |                PESAN KENDARAAN              |\n";
+    cout << "   |                 PESAN KENDARAAN             |\n";
     cout << "   -----------------------------------------------\n";
     cout << "   Kendaraan : " << b.nama << endl;
     cout << "   -----------------------------------------------\n";
-
     cout << "   Tanggal Mulai                      : "
          << t.hariAwal << "-" << t.bulanAwal << "-" << t.tahunAwal << endl;
 
-    cout << "   Input Tanggal Selesai (DD MM YYYY) : ";
-    cin >> t.hariAkhir >> t.bulanAkhir >> t.tahunAkhir;
+    bool tanggalValid = false;
+    do {
+        cout << "   Input Tanggal Selesai (DD MM YYYY) : ";
+        cin >> t.hariAkhir >> t.bulanAkhir >> t.tahunAkhir;
+
+        int totalAwal = hitungHari(t.hariAwal, t.bulanAwal, t.tahunAwal);
+        int totalAkhir = hitungHari(t.hariAkhir, t.bulanAkhir, t.tahunAkhir);
+        t.totalDurasi = totalAkhir - totalAwal;
+
+        if (t.totalDurasi > 0) {
+            tanggalValid = true; 
+        } else {
+            cout << "   [Error] Tanggal tidak valid! Harus setelah tanggal mulai.\n" << endl;
+        }
+    } while (!tanggalValid);
 
     cout << "   -----------------------------------------------\n";
-
-    int totalAwal = hitungHari(t.hariAwal, t.bulanAwal, t.tahunAwal);
-    int totalAkhir = hitungHari(t.hariAkhir, t.bulanAkhir, t.tahunAkhir);
-
-    t.totalDurasi = totalAkhir - totalAwal;
-
-  
-    if (t.totalDurasi > 0)
-    {
-        t.totalBayar = t.totalDurasi * b.harga;
-
-        cetakNota(t);
-    }
-    else
-    {
-        cout << "\n   [Error] Tanggal selesai tidak valid (harus setelah tanggal mulai)!" << endl;
-        jedaTampilan();
-    }
+    t.totalBayar = t.totalDurasi * b.harga;
+    cetakNota(t);
+    prosesPembayaran(t);
 }
 
 void pilihBarangUntukDipesan()
@@ -124,6 +155,7 @@ void pilihBarangUntukDipesan()
         }
     } while (key != 13); 
     prosesPesanan(user[user_id].username, daftarBarang[subPilih]);
+    dashboardUser();
 }
 
 void dashboardUser()
