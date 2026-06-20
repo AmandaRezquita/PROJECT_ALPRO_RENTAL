@@ -165,7 +165,6 @@ void dashboardUser()
         break;
     case 1:
         pilihBarangUntukDipesan();
-        dashboardUser();
         break;
     case 2:
         spasi();
