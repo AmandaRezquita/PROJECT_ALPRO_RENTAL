@@ -2,6 +2,8 @@
 #include <string>
 #include <cstdlib>
 #include <conio.h>
+#include <iomanip>
+#include <ctime>
 #define BLUE "\033[34m"
 #define RESET "\033[0m"
 using namespace std;
@@ -29,7 +31,7 @@ Barang daftarBarang[MAX];
 int jumlahUser = 2;
 int pilihMenu = 0;
 int jumlahBarang = 0;
-int edit;
+int edit, user_id;
 char yesorno;
 string tempJenis, tempMerk, tempDeskripsi;
 
@@ -132,8 +134,10 @@ bool cekUser(string u, string p)
 {
     for (int i = 0; i < jumlahUser; i++)
     {
-        if (u == user[i].username && p == user[i].password)
+        if (u == user[i].username && p == user[i].password){
+            user_id = i;
             return true;
+        }
     }
     return false;
 }
