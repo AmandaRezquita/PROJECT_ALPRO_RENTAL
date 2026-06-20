@@ -1,11 +1,15 @@
 #include <iostream>
 #include <string>
 #include <cstdlib>
+#include <conio.h>
+#define BLUE "\033[34m"
+#define RESET "\033[0m"
 using namespace std;
 
 const int MAX = 100;
 
-struct Account{
+struct Account
+{
     string username;
     string password;
 };
@@ -14,292 +18,313 @@ Account admin[1];
 Account user[MAX];
 
 int jumlahUser = 2;
+int pilihMenu = 0;
 
-//================ DATA AWAL =================
+void clearBuffer()
+{
+    cin.clear();
+    cin.ignore(MAX, '\n');
+}
+
+void spasi()
+{
+    cout << endl
+         << '\t' << "     ";
+}
+
+void bersihkanLayar()
+{
+    cout << "\033[2J\033[H";
+    system("cls");
+}
+
+void jedaTampilan()
+{
+    cout << "\n>> Tekan ENTER untuk kembali...";
+    _getch();
+}
+
+void lanjutTampilan()
+{
+    cout << "\n>> Tekan ENTER untuk lanjut...";
+    _getch();
+}
+
 void dataAwal()
 {
     admin[0].username = "admin";
     admin[0].password = "admin123";
-
     user[0].username = "user1";
     user[0].password = "123";
-
     user[1].username = "user2";
     user[1].password = "456";
 }
 
-//============== BERSIHKAN LAYAR =============
-void bersihkanLayar()
+void tampilkanVespa()
 {
-    system("cls");
-}
-void jedaTampilan() {
-	cout << ">> Tekan ENTER untuk pulse berikutnya...";
-	cin.ignore();
-	cin.get();
-}
-
-void banner(){
-cout << "\033[38;2;0;0;0m";
-cout << R"(
-▄▄▄ ▄ ▄▄▄ ▄▄▄ ▄▄▄ ▄▄ ▄     ▄▄  ▄▄▄ ▄▄  ▄▄▄ ▄▄  ▄      ▄ ▄ ▄▄▄ ▄▄  ▄▄  ▄▄  ▄▄  ▄▄  ▄▄  ▄▄      
-▀▄  █ ▀▄   █  █▄  █ █ █    █▄▀ █▄  █ █  █  █▄█ █      █▄▀ █▄  █ █ █ █ █▄█ █▄▀ █▄█ █▄█ █ █     
-▄▄▀ ▄ ▄▄▀  █  █▄▄ █   █    █ █ █▄▄ █ █  █  █ █ █▄▄    █ █ █▄▄ █ █ █▄▀ █ █ █ █ █ █ █ █ █ █     
-
-)";
-cout << "\033[0m";
+    cout << "\t                                        ,-~ |" << endl;
+    cout << "\t     ________________                o==]___|" << endl;
+    cout << "\t    |                |                \\ \\" << endl;
+    cout << "\t    |________________|                /\\ \\" << endl;
+    cout << "\t__  /  _,-----._     )             |  \\ \\." << endl;
+    cout << "\t|_||/_-~         `.   /()          |  /|]_|_____" << endl;
+    cout << "\t  |//             \\ |              \\/ /_-~     ~-_" << endl;
+    cout << "\t  //________________||              / //__________\\" << endl;
+    cout << "\t //__|______________| \\____________/ //___/-\\ \\~-_" << endl;
+    cout << "\t((_________________/_-o___________/_//___/  /\\,\\  \\" << endl;
+    cout << "\t |__/(  ((====)o===--~~                 (  ( (o/)  )" << endl;
+    cout << "\t      \\  ``==' /                         \\  `--'  /" << endl;
+    cout << "\t       `-.__,-'                           `-.__,-'" << endl;
 }
 
-void pembatas() {
-	cout << "===============================\n";
+bool cekAdmin(string u, string p)
+{
+    return (u == admin[0].username && p == admin[0].password);
 }
 
-//============== CEK ADMIN ===================
-bool cekAdmin(string username, string password) {
-	
-    if(username == admin[0].username && 
-	password == admin[0].password)
+bool cekUser(string u, string p)
+{
+    for (int i = 0; i < jumlahUser; i++)
     {
+        if (u == user[i].username && p == user[i].password)
+            return true;
+    }
+    return false;
+}
+
+bool cekUsername(string u)
+{
+    if (u == admin[0].username)
         return true;
-    }
-
-    return false;
-}
-
-//=============== CEK USER ===================
-bool cekUser(string username,string password)
-{
-    for(int i=0;i<jumlahUser;i++)
+    for (int i = 0; i < jumlahUser; i++)
     {
-        if(username == user[i].username &&
-           password == user[i].password)
-        {
+        if (u == user[i].username)
             return true;
-        }
     }
-
     return false;
 }
 
-//=========== CEK USERNAME ===================
-bool usernameTerdaftar(string username)
+void loginAdmin()
 {
-	if(username == admin[0].username) {
-		return true;
-	}
-    for(int i=0;i<jumlahUser;i++)
-    {
-        if(username == user[i].username)
-        {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-//============= LOGIN ADMIN ==================
-void loginAdmin(){
     bersihkanLayar();
-    string username,password;
-	cout << "===============================\n";
-    cout << "|      LOGIN ADMIN            |\n";
-    cout << "===============================\n";
-
+    string u, p;
+    cout << endl;
+    tampilkanVespa();
+    cout << '\n';
+    cout << "     ===========================================================\n";
+    cout << endl;
+    cout << "       ";
+    cout << "      L O G I N  S E B E G A I  A D M I N\n";
+    cout << endl;
+    cout << '\t' << "     ";
     cout << "Username : ";
-    cin >> username;
-
+    cin >> u;
+    cout << endl;
+    cout << '\t' << "     ";
     cout << "Password : ";
-    cin >> password;
-
-    if(cekAdmin(username,password))
+    cin >> p;
+    if (cekAdmin(u, p))
     {
-    	pembatas();
-        cout << "Login Admin Berhasil.\n";
-        cout << "Selamat Datang Admin.\n";
-        pembatas();
+        cout << endl;
+        cout << '\t' << "     ";
+        cout << BLUE << "[Login Berhasil!]\n"
+             << RESET
+             << endl;
+        lanjutTampilan();
     }
     else
     {
-    	pembatas();
-        cout << "Username atau Password Salah.\n";
-    	pembatas();
+        cout << endl;
+        cout << '\t' << "     ";
+        cout << "[Login Gagal!]\n"
+             << endl;
+        jedaTampilan();
+    }
+}
+
+void loginUser()
+{
+    bersihkanLayar();
+    string u, p;
+    cout << endl;
+    tampilkanVespa();
+    cout << '\n';
+    cout << "     ===========================================================\n";
+    cout << endl;
+    cout << "       ";
+    cout << "      L O G I N  S E B E G A I  U S E R\n";
+    cout << endl;
+    cout << '\t' << "     ";
+    cout << "Username : ";
+    cin >> u;
+    cout << endl;
+    cout << '\t' << "     ";
+    cout << "Password : ";
+    cin >> p;
+    if (cekUser(u, p))
+    {
+        cout << endl;
+        cout << '\t' << "     ";
+        cout << BLUE << "[Login Berhasil!]\n"
+             << RESET << endl;
+    }
+    else
+    {
+        cout << endl;
+        cout << '\t' << "     ";
+        cout << "[Login Gagal!]\n"
+             << endl;
     }
     jedaTampilan();
 }
 
-//============== LOGIN USER ==================
-void loginUser(){
+void registrasi()
+{
     bersihkanLayar();
-    string username,password;
-    cout << "===============================\n";
-    cout << "|         LOGIN USER          |\n";
-    cout << "===============================\n";
-
+    string u, p, c;
+    cout << endl;
+    tampilkanVespa();
+    cout << '\n';
+    cout << "     ===========================================================\n";
+    cout << endl;
+    cout << "       ";
+    cout << "      R E G I S T R A S I\n";
+    cout << endl;
+    cout << '\t' << "     ";
     cout << "Username : ";
-    cin >> username;
-
-    cout << "Password : ";
-    cin >> password;
-
-    if(cekUser(username,password))
+    cin >> u;
+    if (cekUsername(u))
     {
-    	pembatas();
-        cout << "\nLogin User Berhasil.\n";
-        cout << "Selamat Datang User.\n";
+        cout << endl;
+        cout << '\t' << "     ";
+        cout << "[Username sudah terdaftar!]\n";
     }
     else
     {
-    	pembatas();
-        cout << "Username atau Password Salah.\n";
-        pembatas();
+        cout << endl;
+        cout << '\t' << "     ";
+        cout << "Password : ";
+        cin >> p;
+        cout << endl;
+        cout << '\t' << "     ";
+        cout << "Konfirmasi : ";
+        cin >> c;
+        if (p == c)
+        {
+            user[jumlahUser].username = u;
+            user[jumlahUser].password = p;
+            jumlahUser++;
+            cout << endl;
+            cout << '\t' << "     ";
+            cout << "[Akun berhasil dibuat!]\n";
+        }
+        else
+        {
+            cout << endl;
+            cout << '\t' << "     ";
+            cout << "[Password tidak cocok!]\n";
+        }
     }
     jedaTampilan();
 }
 
-//================ LOGIN =====================
-void login()
+void loginSubMenu()
 {
-    int pilih;
-	do{
-    bersihkanLayar();
-    cout << "===============================\n";
-    cout << "|             LOGIN           |\n";
-    cout << "===============================\n";
-    cout << "1. Login sebagai Admin\n";
-    cout << "2. Login sebagai User\n";
-    cout << "0. Kembali\n";
-    pembatas();
-    cout << "Pilihan : ";
-    cin >> pilih;
-
-    switch(pilih)
+    int key;
+    int subPilih = 0;
+    do
     {
-        case 1:
-            loginAdmin();
-            break;
-
-        case 2:
-            loginUser();
-            break;
-            
-        case 0:
-        	pembatas();
-            cout << "Kembbali ke Menu Utama\n";
-            break;
-
-        default:
-        	pembatas();
-            cout<<"Pilihan Tidak Valid.\n";
-            jedaTampilan();
+        bersihkanLayar();
+        cout << endl;
+        tampilkanVespa();
+        cout << '\n';
+        cout << "     ===========================================================\n";
+        cout << endl;
+        cout << "       ";
+        cout << "      L O G I N\n";
+        string menu[] = {"Login Sebagai Admin", "Login Sebagai User", "Kembali"};
+        for (int i = 0; i < 3; i++)
+        {
+            cout << endl;
+            cout << '\t' << "     ";
+            if (i == subPilih)
+                cout << "\033[36m>> " << menu[i] << "\033[0m" << endl;
+            else
+                cout << "   " << menu[i] << endl;
         }
-    } while(pilih != 0);
+        key = _getch();
+        if (key == 224)
+        {
+            key = _getch();
+            if (key == 72)
+                subPilih = (subPilih == 0) ? 2 : subPilih - 1;
+            else if (key == 80)
+                subPilih = (subPilih == 2) ? 0 : subPilih + 1;
+        }
+    } while (key != 13);
+
+    if (subPilih == 0)
+        loginAdmin();
+    else if (subPilih == 1)
+        loginUser();
 }
 
-//============= BIKIN AKUN ===================
-void bikinAkun()
-{
-    bersihkanLayar();
-    string username,password,confirm;
-
-    cout << "===============================\n";
-    cout << "|      REGISTRASI PENGGUNA    |\n";
-    cout << "===============================\n";
-
-    cout << "Username : ";
-    cin >> username;
-
-    if(usernameTerdaftar(username))
-    {
-    	pembatas();
-        cout <<"Username sudah digunakan.\n";
-        pembatas();
-        jedaTampilan() ;
-        return;
-    }
-
-    cout << "Password : ";
-    cin >> password;
-
-    cout << "Confirm Password : ";
-    cin >> confirm;
-
-    if(password != confirm)
-    {
-      	pembatas();
-        cout << "Konfirmasi Password Tidak Sama.\n";
-    	pembatas();
-        jedaTampilan() ;
-        return;
-    }
-
-    user[jumlahUser].username = username;
-    user[jumlahUser].password = password;
-    jumlahUser++;
-	pembatas();
-    cout << "Akun Berhasil Dibuat.\n";
-    pembatas();
-    jedaTampilan() ;
-}
-
-//============== MENU UTAMA ==================
 void menuUtama()
 {
-    int pilihan;
-
-    do{
+    int key;
+    do
+    {
         bersihkanLayar();
-		banner();
-         cout << "===============================\n";
- 		 cout << "|   SISTEM RENTAL KENDARAAN   |\n";
-         cout << "===============================\n";
-        cout << "1. Login\n";
-        cout << "2. Registrasi Pengguna\n";
-        cout << "0. Keluar\n";
-        pembatas();
-        cout << "Pilihan : ";
-        cin >> pilihan;
-
-        if(cin.fail())
+        cout << endl;
+        tampilkanVespa();
+        cout << '\n';
+        cout << "     ===========================================================\n";
+        cout << endl;
+        cout << "       ";
+        cout << "      S I S T E M  R E N T A L  K E N D A R A A N      \n";
+        string menu[] = {"Login", "Registrasi", "Keluar"};
+        for (int i = 0; i < 3; i++)
         {
-            cin.clear();
-            cin.ignore(1000,'\n');
+            cout << endl;
+            cout << '\t' << "     ";
 
-            cout << "\nInput harus berupa angka!\n";
-            jedaTampilan() ;
-            continue;
-        }
-        switch(pilihan){
-            case 1:
-                login();
-                break;
-
-            case 2:
-                bikinAkun();
-                break;
-
-            case 0:
-            	pembatas();
-                cout<<"Terima Kasih.\n";
-                pembatas();
-                break;
-
-            default:
-                pembatas();
-                cout << "Pilihan Tidak Valid!\n";
-                cout << "Silakan Pilih Menu yang Tersedia.\n";
-                pembatas();
-                jedaTampilan() ;
+            if (i == pilihMenu)
+                cout << "\033[36m>> " << menu[i] << "\033[0m" << endl;
+            else
+                cout << "   " << menu[i] << endl;
         }
 
-    }while(pilihan!=0);
+        key = _getch();
+        if (key == 224)
+        {
+            key = _getch();
+            if (key == 72)
+                pilihMenu = (pilihMenu == 0) ? 2 : pilihMenu - 1;
+            else if (key == 80)
+                pilihMenu = (pilihMenu == 2) ? 0 : pilihMenu + 1;
+        }
+    } while (key != 13);
+
+    switch (pilihMenu)
+    {
+    case 0:
+        loginSubMenu();
+        menuUtama();
+        break;
+    case 1:
+        registrasi();
+        menuUtama();
+        break;
+    case 2:
+        cout << "\nTerima Kasih!\n";
+        break;
+    }
 }
 
-//=================== MAIN ===================
+
 int main()
 {
     dataAwal();
     menuUtama();
-
     return 0;
 }
