@@ -16,6 +16,9 @@ struct Transaksi
     double totalBayar;
 };
 
+Transaksi t;
+
+int subPilih_t = 0;
 void bersihkanLayar();
 void jedaTampilan();
 
@@ -24,28 +27,34 @@ int hitungHari(int h, int b, int t)
     return h + (b * 30) + (t * 365);
 }
 
-void prosesPembayaran(Transaksi t) {
+void prosesPembayaran(Transaksi t)
+{
     double uangDibayar, kembalian;
     bool pembayaranBerhasil = false;
 
     bersihkanLayar();
     cout << "\n   -----------------------------------------------\n";
-    cout << "   |              MENU PEMBAYARAN                |\n";
+    cout << "   |              P E M B A Y A R A N            |\n";
     cout << "   -----------------------------------------------\n";
     cout << "   Total Tagihan : Rp " << t.totalBayar << endl;
     cout << "   -----------------------------------------------\n";
 
-    do {
+    do
+    {
         cout << "   Masukkan jumlah uang pembayaran : Rp ";
         cin >> uangDibayar;
 
-        if (uangDibayar >= t.totalBayar) {
+        if (uangDibayar >= t.totalBayar)
+        {
             kembalian = uangDibayar - t.totalBayar;
-            pembayaranBerhasil = true; 
-        } else {
-            cout << "   [Error] Uang tidak cukup! Kekurangan: Rp " 
+            pembayaranBerhasil = true;
+        }
+        else
+        {
+            cout << "   [Error] Uang tidak cukup! Kekurangan: Rp "
                  << (t.totalBayar - uangDibayar) << endl;
-            cout << "   Silakan masukkan jumlah yang benar.\n" << endl;
+            cout << "   Silakan masukkan jumlah yang benar.\n"
+                 << endl;
         }
     } while (!pembayaranBerhasil);
 
@@ -53,17 +62,17 @@ void prosesPembayaran(Transaksi t) {
     cout << "   Status        : Pembayaran Berhasil!" << endl;
     cout << "   Kembalian     : Rp " << kembalian << endl;
     cout << "   -----------------------------------------------\n";
-    cout << "\n   Transaksi selesai. Terima kasih!" << endl; 
+    cout << "\n   Transaksi selesai. Terima kasih!" << endl;
+    daftarBarang[subPilih_t].available = false;
 
     lanjutTampilan();
-
 }
 
 void cetakNota(Transaksi t)
 {
     bersihkanLayar();
     cout << "\n   -----------------------------------------------\n";
-    cout << "   |             NOTA PEMESANAN KENDARAAN        |\n";
+    cout << "   |             N O T A  P E S A N A N          |\n";
     cout << "   -----------------------------------------------\n";
     cout << "   ID Pesanan    : " << t.kode << endl;
     cout << "   User          : " << t.pembeli << endl;
@@ -79,7 +88,6 @@ void cetakNota(Transaksi t)
 
 void prosesPesanan(string namaUser, Barang b)
 {
-    Transaksi t;
     t.pembeli = namaUser;
     t.barang = b.nama;
     t.kode = "TRX-" + namaUser.substr(0, 2);
@@ -93,7 +101,7 @@ void prosesPesanan(string namaUser, Barang b)
 
     bersihkanLayar();
     cout << "\n   -----------------------------------------------\n";
-    cout << "   |                 PESAN KENDARAAN             |\n";
+    cout << "   |          S E W A  K E N D A R A A N         |\n";
     cout << "   -----------------------------------------------\n";
     cout << "   Kendaraan : " << b.nama << endl;
     cout << "   -----------------------------------------------\n";
@@ -101,7 +109,8 @@ void prosesPesanan(string namaUser, Barang b)
          << t.hariAwal << "-" << t.bulanAwal << "-" << t.tahunAwal << endl;
 
     bool tanggalValid = false;
-    do {
+    do
+    {
         cout << "   Input Tanggal Selesai (DD MM YYYY) : ";
         cin >> t.hariAkhir >> t.bulanAkhir >> t.tahunAkhir;
 
@@ -109,10 +118,14 @@ void prosesPesanan(string namaUser, Barang b)
         int totalAkhir = hitungHari(t.hariAkhir, t.bulanAkhir, t.tahunAkhir);
         t.totalDurasi = totalAkhir - totalAwal;
 
-        if (t.totalDurasi > 0) {
-            tanggalValid = true; 
-        } else {
-            cout << "   [Error] Tanggal tidak valid! Harus setelah tanggal mulai.\n" << endl;
+        if (t.totalDurasi > 0)
+        {
+            tanggalValid = true;
+        }
+        else
+        {
+            cout << "   [Error] Tanggal tidak valid! Harus setelah tanggal mulai.\n"
+                 << endl;
         }
     } while (!tanggalValid);
 
@@ -124,22 +137,21 @@ void prosesPesanan(string namaUser, Barang b)
 
 void pilihBarangUntukDipesan()
 {
-    int subPilih = 0;
     int key;
 
     do
     {
         bersihkanLayar();
         cout << "\n   -----------------------------------------------\n";
-        cout << "   |             P E S A N  B A R A N G          |\n";
+        cout << "   |            P E S A N  B A R A N G           |\n";
         cout << "   -----------------------------------------------\n";
-
+        cout << endl;
         for (int i = 0; i < jumlahBarang; i++)
         {
-
-            string penanda = (i == subPilih) ? "\033[36m>> " : "   ";
+            string penanda = (i == subPilih_t) ? "\033[36m>> " : "   ";
             cout << "   " << penanda << left << setw(15) << daftarBarang[i].nama
                  << "- Rp" << daftarBarang[i].harga << "\033[0m" << endl;
+            cout << endl;
         }
 
         cout << "   -----------------------------------------------\n";
@@ -148,18 +160,24 @@ void pilihBarangUntukDipesan()
         if (key == 224)
         {
             key = _getch();
-            if (key == 72) 
-                subPilih = (subPilih == 0) ? jumlahBarang - 1 : subPilih - 1;
-            else if (key == 80) 
-                subPilih = (subPilih == jumlahBarang - 1) ? 0 : subPilih + 1;
+            if (key == 72)
+                subPilih_t = (subPilih_t == 0) ? jumlahBarang - 1 : subPilih_t - 1;
+            else if (key == 80)
+                subPilih_t = (subPilih_t == jumlahBarang - 1) ? 0 : subPilih_t + 1;
         }
-    } while (key != 13); 
-    prosesPesanan(user[user_id].username, daftarBarang[subPilih]);
+    } while (key != 13);
+    prosesPesanan(user[user_id].username, daftarBarang[subPilih_t]);
     dashboardUser();
 }
 
 void dashboardUser()
 {
+    time_t now = time(0);
+    tm *ltm = localtime(&now);
+
+    t.hariAwal = ltm->tm_mday;
+    t.bulanAwal = 1 + ltm->tm_mon;
+    t.tahunAwal = 1900 + ltm->tm_year;
     int subPilih = 0;
     int key;
     do
@@ -171,6 +189,9 @@ void dashboardUser()
         cout << "   |          D A S H B O A R D  U S E R         |\n";
         cout << "   |                                             |\n";
         cout << "   ===============================================\n";
+        cout << "   \033[36m[Selamat datang : " << user[user_id].username << "]\033[0m\n";
+        cout << "   -----------------------------------------------\n";
+        cout << setw(45) << "\033[36m[" << t.hariAwal << "-" << t.bulanAwal << "-" << t.tahunAwal << "]\033[0m\n";
 
         string menu[] = {"Lihat Barang", "Pesan Barang", "Logout"};
         for (int i = 0; i < 3; i++)
@@ -178,6 +199,7 @@ void dashboardUser()
             cout << endl
                  << "              " << (i == subPilih ? "\033[36m>> " : "   ") << menu[i] << "\033[0m" << endl;
         }
+        cout << "\n   ===============================================\n";
         key = _getch();
         if (key == 224)
         {
@@ -199,14 +221,12 @@ void dashboardUser()
         pilihBarangUntukDipesan();
         break;
     case 2:
-        spasi();
-        cout << " Apakah anda yakin ingin logout ? (y/n) ";
+        cout << "   Apakah anda yakin ingin logout ? (y/n) ";
         cin >> yesorno;
 
         if (yesorno == 'y' || yesorno == 'Y')
         {
-            spasi();
-            cout << " Logout berhasil!" << endl;
+            cout << "\n   [Logout berhasil!]" << endl;
             lanjutTampilan();
             menuUtama();
         }

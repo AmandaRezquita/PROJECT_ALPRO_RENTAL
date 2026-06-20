@@ -212,6 +212,7 @@ void kelolaBarang()
             cout << endl
                  << "                 " << (i == subPilih ? "\033[36m>> " : "   ") << menu[i] << "\033[0m" << endl;
         }
+        cout << "\n   ===============================================\n";
         key = _getch();
         if (key == 224)
         {
@@ -259,6 +260,8 @@ void dashboardAdmin()
         cout << "   |        D A S H B O A R D  A D M I N         |\n";
         cout << "   |                                             |\n";
         cout << "   ===============================================\n";
+        cout << setw(44) << "\033[36m[" << tanggal_sekarang << "]\033[0m\n";
+        cout << "   -----------------------------------------------\n";
 
         string menu[] = {"Data Barang", "Logout"};
         for (int i = 0; i < 2; i++)
@@ -266,6 +269,7 @@ void dashboardAdmin()
             cout << endl
                  << "            " << (i == subPilih ? "\033[36m>> " : "   ") << menu[i] << "\033[0m" << endl;
         }
+        cout << "\n   ===============================================\n";
         key = _getch();
         if (key == 224)
         {
@@ -281,14 +285,12 @@ void dashboardAdmin()
     }
     else
     {
-        spasi();
-        cout << "  Apakah anda yakin ingin logout ? (y/n) ";
+        cout << "   Apakah anda yakin ingin logout ? (y/n) ";
         cin >> yesorno;
 
         if (yesorno == 'y' || yesorno == 'Y')
         {
-            spasi();
-            cout << "  Logout berhasil!" << endl;
+            cout << "\n   [Logout berhasil!]" << endl;
             lanjutTampilan();
             menuUtama();
         }

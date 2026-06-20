@@ -10,6 +10,23 @@ using namespace std;
 
 const int MAX = 100;
 
+string getTanggalSekarang() {
+    time_t now = time(0);
+    tm *ltm = localtime(&now);
+
+    int d = ltm->tm_mday;
+    int m = 1 + ltm->tm_mon;
+    int y = 1900 + ltm->tm_year;
+
+    string hari = (d < 10 ? "0" : "") + to_string(d);
+    string bulan = (m < 10 ? "0" : "") + to_string(m);
+    string tahun = to_string(y);
+
+    return hari + "-" + bulan + "-" + tahun;
+}
+
+string tanggal_sekarang = getTanggalSekarang();
+
 struct Account
 {
     string username;
@@ -218,6 +235,7 @@ void loginUser()
         cout << '\t' << "     ";
         cout << BLUE << "[Login Berhasil!]\n"
              << RESET << endl;
+        lanjutTampilan();
         dashboardUser();
     }
     else
