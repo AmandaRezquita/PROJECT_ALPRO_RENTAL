@@ -37,7 +37,7 @@ void dashboardAdmin();
 void kelolaBarang();
 void createBarang();
 void readBarang();
-void updateBarang();
+void pilih_Barang_Edit();
 void deleteBarang();
 
 void inisialisasiDummyData()
@@ -367,89 +367,133 @@ void menuUtama()
     }
 }
 
-void menuFilterBarang()
+void cetakHeaderFilter(string jenis, string merk)
 {
     bersihkanLayar();
+    cout << "\n";
+    cout << "   -----------------------------------------------\n";
+    cout << "   |           F I L T E R  B A R A N G          |\n";
+    cout << "   -----------------------------------------------\n";
+    if (!jenis.empty())
+        cout << "\tJenis : " << jenis << "\n";
+    if (!merk.empty())
+        cout << "\tMerk  : " << merk << "\n\n";
+}
+
+void menuFilterBarang()
+{
     string fJenis, fMerk;
-    int pilihanHarga;
     int hMin = 0, hMax = 99999999;
 
-    cout << endl;
-    tampilkanVespa();
-    cout << "\n   ===========================================================\n";
-    cout << "                      F I L T E R   B A R A N G\n";
-    cout << "     ===========================================================\n";
-
+    cetakHeaderFilter("", "");
     clearBuffer();
-    while (true)
+
+    do
     {
-        cout << "\tMasukkan Jenis (Motor/Mobil) : ";
+        cout << "\n   Masukkan Jenis (Motor/Mobil) : ";
         getline(cin, fJenis);
-        
-        if (fJenis == "motor" || fJenis == "Motor" || fJenis == "MOTOR") {
+        if (fJenis == "motor" || fJenis == "Motor" || fJenis == "MOTOR")
+        {
             fJenis = "Motor";
             break;
-        } else if (fJenis == "mobil" || fJenis == "Mobil" || fJenis == "MOBIL") {
-            fJenis = "Mobil"; 
+        }
+        if (fJenis == "mobil" || fJenis == "Mobil" || fJenis == "MOBIL")
+        {
+            fJenis = "Mobil";
             break;
         }
-        cout << "\t[Input Salah! Masukkan Motor atau Mobil]\n\n";
-    }
+        cout << "   [Input Salah! Masukkan Motor atau Mobil]\n\n";
+    } while (true);
 
+    cout << endl;
     while (true)
     {
-        cout << "\tMasukkan Merk (Honda/dll)    : ";
+        cout << "   Masukkan Merk (Honda/dll)    : ";
         getline(cin, fMerk);
-        
-        if (fMerk == "honda" || fMerk == "Honda" || fMerk == "HONDA") {
-            fMerk = "Honda"; 
+        if (fMerk == "honda" || fMerk == "Honda" || fMerk == "HONDA")
+        {
+            fMerk = "Honda";
             break;
         }
-        cout << "\t[Input Salah! Hanya tersedia merk Honda]\n\n";
+        cout << "   [Input Salah! Hanya tersedia merk Honda]\n\n";
     }
 
-    cout << "\n\tPilih Rentang Harga Per Hari :\n";
-    cout << "\t[1] Rp 0 - Rp 100.000\n";
-    cout << "\t[2] Rp 100.001 - Rp 200.000\n";
-    cout << "\t[3] Rp 200.001 - Rp 500.000\n";
-    cout << "\t[4] Semua Harga\n";
-    cout << "\tMasukkan Pilihan (1-4): ";
-    cin >> pilihanHarga;
+    const int TOTAL_MENU = 4;
+    string menuHarga[TOTAL_MENU] = {
+        "Rp 0 - Rp 100.000",
+        "Rp 100.001 - Rp 200.000",
+        "Rp 200.001 - Rp 500.000",
+        "Tampilkan Semua Harga"};
+    int pilihHarga = 0;
+    char key;
 
-    switch (pilihanHarga)
+    do
     {
-    case 1: hMin = 0; hMax = 100000; break;
-    case 2: hMin = 100001; hMax = 200000; break;
-    case 3: hMin = 200001; hMax = 500000; break;
-    default: hMin = 0; hMax = 99999999; break;
+        cetakHeaderFilter(fJenis, fMerk);
+        cout << "\tPilih Rentang Harga Per Hari (Gunakan Panah + ENTER):\n";
+
+        for (int i = 0; i < TOTAL_MENU; i++)
+        {
+            if (i == pilihHarga)
+                cout << "\t\033[36m>> " << menuHarga[i] << "\033[0m\n";
+            else
+                cout << "\t   " << menuHarga[i] << "\n";
+        }
+
+        key = _getch();
+        if (key == 224 || key == -32)
+        {
+            key = _getch();
+            if (key == 72)
+                pilihHarga = (pilihHarga == 0) ? TOTAL_MENU - 1 : pilihHarga - 1;
+            else if (key == 80)
+                pilihHarga = (pilihHarga == TOTAL_MENU - 1) ? 0 : pilihHarga + 1;
+        }
+    } while (key != 13);
+
+    switch (pilihHarga)
+    {
+    case 0:
+        hMin = 0;
+        hMax = 100000;
+        break;
+    case 1:
+        hMin = 100001;
+        hMax = 200000;
+        break;
+    case 2:
+        hMin = 200001;
+        hMax = 500000;
+        break;
+    case 3:
+        hMin = 0;
+        hMax = 99999999;
+        break;
     }
 
     bersihkanLayar();
-    cout << "\n     ==================== HASIL FILTER ====================\n\n";
+    cout << "\n   ==================== HASIL FILTER ====================\n\n";
     bool ditemukan = false;
     int nomor = 1;
 
     for (int i = 0; i < jumlahBarang; i++)
     {
-        bool cocokJenis = (daftarBarang[i].deskripsi.find(fJenis) <= daftarBarang[i].deskripsi.length());
-        bool cocokMerk  = (daftarBarang[i].deskripsi.find(fMerk) <= daftarBarang[i].deskripsi.length());
-        bool cocokHarga = (daftarBarang[i].harga >= hMin && daftarBarang[i].harga <= hMax);
-
-        if (cocokJenis && cocokMerk && cocokHarga)
+        if ((daftarBarang[i].deskripsi.find(fJenis) <= daftarBarang[i].deskripsi.length()) &&
+            (daftarBarang[i].deskripsi.find(fMerk) <= daftarBarang[i].deskripsi.length()) &&
+            (daftarBarang[i].harga >= hMin && daftarBarang[i].harga <= hMax))
         {
-            cout << "\t[" << nomor++ << "] " << daftarBarang[i].nama << endl;
-            cout << "\t   Harga     : Rp " << daftarBarang[i].harga << " / hari" << endl;
-            cout << "\t   Deskripsi : \n\t   " << daftarBarang[i].deskripsi << endl;
-            cout << "\t ---------------------------------------------------\n";
+            cout << "\n   " << i + 1 << ". Nama       : " << daftarBarang[i].nama << endl;
+            cout << "\n      Harga      : Rp" << daftarBarang[i].harga << endl;
+            cout << "\n      Status     : " << (daftarBarang[i].available ? "Tersedia" : "Sedang Disewa") << endl;
+            cout << "\n      Deskripsi  : " << daftarBarang[i].deskripsi << endl;
+            cout << "\n      " << BLUE << "\033]8;;" << daftarBarang[i].url << "\033\\Foto Produk\033]8;;\033\\" << RESET << endl;
+            cout << "\n   -----------------------------------------------" << endl;
             ditemukan = true;
         }
     }
 
     if (!ditemukan)
-    {
         cout << "\t     [ Tidak ada kendaraan yang cocok ]\n";
-    }
-
     jedaTampilan();
 }
 
@@ -490,8 +534,8 @@ void menuSortirBarang()
 {
     int key;
     int pilihSortir = 0;
-    const int TOTAL_MENU = 5; 
-    
+    const int TOTAL_MENU = 5;
+
     do
     {
         bersihkanLayar();
@@ -501,15 +545,14 @@ void menuSortirBarang()
         cout << "     ===========================================================\n";
         cout << "                       S O R T I R   B A R A N G\n";
         cout << "     ===========================================================\n";
-        
+
         string menu[] = {
-            "Harga Termurah -> Termahal ", 
-            "Harga Termahal -> Termurah ", 
+            "Harga Termurah -> Termahal ",
+            "Harga Termahal -> Termurah ",
             "Nama A -> Z ",
             "Nama Z -> A ",
-            "Kembali"
-        };
-        
+            "Kembali"};
+
         for (int i = 0; i < TOTAL_MENU; i++)
         {
             cout << endl;
@@ -524,34 +567,38 @@ void menuSortirBarang()
         if (key == 224)
         {
             key = _getch();
-            if (key == 72) 
+            if (key == 72)
                 pilihSortir = (pilihSortir == 0) ? TOTAL_MENU - 1 : pilihSortir - 1;
-            else if (key == 80) 
+            else if (key == 80)
                 pilihSortir = (pilihSortir == TOTAL_MENU - 1) ? 0 : pilihSortir + 1;
         }
-    } while (key != 13); 
+    } while (key != 13);
 
-    if (pilihSortir == 4) return; 
+    if (pilihSortir == 4)
+        return;
     switch (pilihSortir)
     {
-        case 0:
-            bubbleSortHarga(true);  
-            break;
-        case 1:
-            bubbleSortHarga(false); 
-            break;
-        case 2:
-            bubbleSortNama(true);   
-            break;
-        case 3:
-            bubbleSortNama(false);  
-            break;
+    case 0:
+        bubbleSortHarga(true);
+        break;
+    case 1:
+        bubbleSortHarga(false);
+        break;
+    case 2:
+        bubbleSortNama(true);
+        break;
+    case 3:
+        bubbleSortNama(false);
+        break;
     }
     bersihkanLayar();
     cout << "\n     ==================== HASIL SORTIR ====================\n\n";
-    if (jumlahBarang == 0) {
+    if (jumlahBarang == 0)
+    {
         cout << "\t     [ Tidak ada kendaraan yang tersedia ]\n";
-    } else {
+    }
+    else
+    {
         for (int i = 0; i < jumlahBarang; i++)
         {
             cout << "\t[" << i + 1 << "] " << daftarBarang[i].nama << endl;
