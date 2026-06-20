@@ -16,9 +16,11 @@ struct Account
 
 Account admin[1];
 Account user[MAX];
-
 int jumlahUser = 2;
 int pilihMenu = 0;
+int yesorno;
+
+void dashboardAdmin();
 
 void clearBuffer()
 {
@@ -131,6 +133,7 @@ void loginAdmin()
              << RESET
              << endl;
         lanjutTampilan();
+        dashboardAdmin();
     }
     else
     {
@@ -167,6 +170,7 @@ void loginUser()
         cout << '\t' << "     ";
         cout << BLUE << "[Login Berhasil!]\n"
              << RESET << endl;
+        dashboardAdmin();
     }
     else
     {
@@ -197,7 +201,7 @@ void registrasi()
     {
         cout << endl;
         cout << '\t' << "     ";
-        cout << "[Username sudah terdaftar!]\n";
+        cout << "Username sudah terdaftar!\n";
     }
     else
     {
@@ -320,7 +324,6 @@ void menuUtama()
         break;
     }
 }
-
 
 int main()
 {
