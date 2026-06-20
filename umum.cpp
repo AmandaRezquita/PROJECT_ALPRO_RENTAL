@@ -34,6 +34,7 @@ char yesorno;
 string tempJenis, tempMerk, tempDeskripsi;
 
 void dashboardAdmin();
+void dashboardUser();
 void kelolaBarang();
 void createBarang();
 void readBarang();
@@ -213,6 +214,7 @@ void loginUser()
         cout << '\t' << "     ";
         cout << BLUE << "[Login Berhasil!]\n"
              << RESET << endl;
+        dashboardUser();
     }
     else
     {

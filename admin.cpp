@@ -92,7 +92,7 @@ void readBarang()
     }
     else
     {
-        kelolaBarang();
+        _getch();
     }
 }
 
