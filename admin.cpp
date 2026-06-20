@@ -84,7 +84,7 @@ void readBarang()
     }
     else if (subPilih == 1)
     {
-        // fungsi filter
+        menuFilterBarang();
     }
     else if (subPilih == 2)
     {

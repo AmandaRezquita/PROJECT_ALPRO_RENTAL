@@ -367,6 +367,92 @@ void menuUtama()
     }
 }
 
+void menuFilterBarang()
+{
+    bersihkanLayar();
+    string fJenis, fMerk;
+    int pilihanHarga;
+    int hMin = 0, hMax = 99999999;
+
+    cout << endl;
+    tampilkanVespa();
+    cout << "\n   ===========================================================\n";
+    cout << "                      F I L T E R   B A R A N G\n";
+    cout << "     ===========================================================\n";
+
+    clearBuffer();
+    while (true)
+    {
+        cout << "\tMasukkan Jenis (Motor/Mobil) : ";
+        getline(cin, fJenis);
+        
+        if (fJenis == "motor" || fJenis == "Motor" || fJenis == "MOTOR") {
+            fJenis = "Motor";
+            break;
+        } else if (fJenis == "mobil" || fJenis == "Mobil" || fJenis == "MOBIL") {
+            fJenis = "Mobil"; 
+            break;
+        }
+        cout << "\t[Input Salah! Masukkan Motor atau Mobil]\n\n";
+    }
+
+    while (true)
+    {
+        cout << "\tMasukkan Merk (Honda/dll)    : ";
+        getline(cin, fMerk);
+        
+        if (fMerk == "honda" || fMerk == "Honda" || fMerk == "HONDA") {
+            fMerk = "Honda"; 
+            break;
+        }
+        cout << "\t[Input Salah! Hanya tersedia merk Honda]\n\n";
+    }
+
+    cout << "\n\tPilih Rentang Harga Per Hari :\n";
+    cout << "\t[1] Rp 0 - Rp 100.000\n";
+    cout << "\t[2] Rp 100.001 - Rp 200.000\n";
+    cout << "\t[3] Rp 200.001 - Rp 500.000\n";
+    cout << "\t[4] Semua Harga\n";
+    cout << "\tMasukkan Pilihan (1-4): ";
+    cin >> pilihanHarga;
+
+    switch (pilihanHarga)
+    {
+    case 1: hMin = 0; hMax = 100000; break;
+    case 2: hMin = 100001; hMax = 200000; break;
+    case 3: hMin = 200001; hMax = 500000; break;
+    default: hMin = 0; hMax = 99999999; break;
+    }
+
+    bersihkanLayar();
+    cout << "\n     ==================== HASIL FILTER ====================\n\n";
+    bool ditemukan = false;
+    int nomor = 1;
+
+    for (int i = 0; i < jumlahBarang; i++)
+    {
+        bool cocokJenis = (daftarBarang[i].deskripsi.find(fJenis) <= daftarBarang[i].deskripsi.length());
+        bool cocokMerk  = (daftarBarang[i].deskripsi.find(fMerk) <= daftarBarang[i].deskripsi.length());
+        bool cocokHarga = (daftarBarang[i].harga >= hMin && daftarBarang[i].harga <= hMax);
+
+        if (cocokJenis && cocokMerk && cocokHarga)
+        {
+            cout << "\t[" << nomor++ << "] " << daftarBarang[i].nama << endl;
+            cout << "\t   Harga     : Rp " << daftarBarang[i].harga << " / hari" << endl;
+            cout << "\t   Deskripsi : \n\t   " << daftarBarang[i].deskripsi << endl;
+            cout << "\t ---------------------------------------------------\n";
+            ditemukan = true;
+        }
+    }
+
+    if (!ditemukan)
+    {
+        cout << "\t     [ Tidak ada kendaraan yang cocok ]\n";
+    }
+
+    jedaTampilan();
+}
+
 int main()
 {
     inisialisasiDummyData();
