@@ -57,6 +57,23 @@ struct Barang
     bool available;
 };
 
+struct Transaksi
+{
+    string kode;
+    string pembeli;
+    string barang;
+    int hariAwal;
+    int bulanAwal;
+    int tahunAwal;
+    int hariAkhir;
+    int bulanAkhir;
+    int tahunAkhir;
+    int totalDurasi;
+    double totalBayar;
+    bool dikembalikan = false;
+    bool diajukan = false;
+};
+
 Account admin[1];
 Barang daftarBarang[MAX];
 User userList[MAX];
@@ -67,6 +84,8 @@ int jumlahBarang = 0;
 int edit;
 char yesorno;
 string tempJenis, tempMerk, tempDeskripsi;
+extern int jumlahRiwayat;
+extern Transaksi riwayatTransaksi[100];
 
 void tampilkanLoading()
 {

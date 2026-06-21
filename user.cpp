@@ -1,23 +1,6 @@
 #include "admin.cpp"
 using namespace std;
 
-struct Transaksi
-{
-    string kode;
-    string pembeli;
-    string barang;
-    int hariAwal;
-    int bulanAwal;
-    int tahunAwal;
-    int hariAkhir;
-    int bulanAkhir;
-    int tahunAkhir;
-    int totalDurasi;
-    double totalBayar;
-    bool dikembalikan = false;
-    bool diajukan = false;
-};
-
 int jumlahRiwayat = 0;
 Transaksi riwayatTransaksi[100];
 int subPilih_t = 0;
