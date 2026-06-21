@@ -1,5 +1,4 @@
 #include "umum.cpp"
-
 using namespace std;
 
 void bersihkanLayar();
@@ -50,15 +49,13 @@ void readBarang()
             cout << "\n   [Data kosong!]";
         for (int i = 0; i < jumlahBarang; i++)
         {
-            cout << "\n   -----------------------------------------------" << endl;
-            cout << "\n   " << i + 1 << ". Nama       : " << daftarBarang[i].nama << endl;
+            cout << "   " << i + 1 << ". Nama       : " << daftarBarang[i].nama << endl;
             cout << "\n      Harga      : Rp" << daftarBarang[i].harga << endl;
             cout << "\n      Status     : " << (daftarBarang[i].available ? "Tersedia" : "Sedang Disewa") << endl;
             cout << "\n      Deskripsi  : " << daftarBarang[i].deskripsi << endl;
             cout << "\n      " << BLUE << "\033]8;;" << daftarBarang[i].url << "\033\\Foto Produk\033]8;;\033\\" << RESET << endl;
+            cout << "   -----------------------------------------------" << endl;
         }
-
-        cout << "\n   ================================================" << endl;
         string menu[] = {"Cari Barang", "Filter Barang", "Sortir Barang", "kembali"};
         for (int i = 0; i < 4; i++)
         {
@@ -80,7 +77,7 @@ void readBarang()
 
     if (subPilih == 0)
     {
-        // fungsi cari
+        cariBarang();
     }
     else if (subPilih == 1)
     {
@@ -250,18 +247,21 @@ void kelolaBarang()
 void menuKonfirmasiPengembalian()
 {
     bersihkanLayar();
-    cout << "\n   ===============================================\n";
-    cout << "   |      K O N F I R M A S I  P E M B A L I A N |\n";
-    cout << "   ===============================================\n";
+    cout << "\n   ====================================================" << endl;
+    cout << "   |   K O N F I R M A S I  P E N G E M B A L I A N   |" << endl;
+    cout << "   ====================================================" << endl;
 
-    int indexDitemukan[100], count = 0;
+    Transaksi* daftarPengembalian[100]; 
+    int count = 0;
+
     for (int i = 0; i < jumlahRiwayat; i++)
     {
         if (riwayatTransaksi[i].diajukan && !riwayatTransaksi[i].dikembalikan)
         {
             cout << "   " << count + 1 << ". User: " << riwayatTransaksi[i].pembeli
                  << " | Alat: " << riwayatTransaksi[i].barang << endl;
-            indexDitemukan[count] = i;
+            
+            daftarPengembalian[count] = &riwayatTransaksi[i];
             count++;
         }
     }
@@ -278,14 +278,14 @@ void menuKonfirmasiPengembalian()
 
         if (pilih > 0 && pilih <= count)
         {
-            int targetIdx = indexDitemukan[pilih - 1];
-            riwayatTransaksi[targetIdx].dikembalikan = true;
-
+            Transaksi* pTarget = daftarPengembalian[pilih - 1];
+            pTarget->dikembalikan = true;
             for (int j = 0; j < jumlahBarang; j++)
             {
-                if (daftarBarang[j].nama == riwayatTransaksi[targetIdx].barang)
+                Barang* pBarang = &daftarBarang[j];
+                if (pBarang->nama == pTarget->barang)
                 {
-                    daftarBarang[j].available = true;
+                    pBarang->available = true;
                     break;
                 }
             }
@@ -300,7 +300,7 @@ void menuLaporanTransaksi()
     bersihkanLayar();
     double totalPendapatan = 0;
     cout << "\n   ===============================================\n";
-    cout << "   |        L A P O R A N  T R A N S A K S I     |\n";
+    cout << "   |       L A P O R A N  T R A N S A K S I      |\n";
     cout << "   ===============================================\n";
 
     for (int i = 0; i < jumlahRiwayat; i++)
@@ -318,6 +318,53 @@ void menuLaporanTransaksi()
     lanjutTampilan();
 }
 
+void daftarPenyewa()
+{
+    bersihkanLayar();
+    cout << "\n   ==========================================================" << endl;
+    cout << "   |              D A F T A R  P E N Y E W A                |" << endl;
+    cout << "   ==========================================================" << endl;
+
+    bool ditemukan = false;
+    int nomor = 1;
+
+    for (int i = 0; i < jumlahRiwayat; i++)
+    {
+        if (!riwayatTransaksi[i].dikembalikan)
+        {
+            ditemukan = true;
+            int id_p = -1;
+            for (int j = 0; j < jumlahUser; j++)
+            {
+                if (userList[j].akun.username == riwayatTransaksi[i].pembeli)
+                {
+                    id_p = j;
+                    break;
+                }
+            }
+
+            cout << "\n   " << nomor++ << ". Nama Barang : " << riwayatTransaksi[i].barang << endl;
+            cout << "      Penyewa     : " << riwayatTransaksi[i].pembeli << endl;
+
+            if (id_p != -1 && userList[id_p].data.profilLengkap)
+            {
+                cout << "      Nama Lengkap: " << userList[id_p].data.namaLengkap << endl;
+                cout << "      No. HP      : " << userList[id_p].data.noTelp << endl;
+            }
+            else
+            {
+                cout << "      Profil      : [Profil belum dilengkapi]" << endl;
+            }
+            cout << "   ----------------------------------------------------------" << endl;
+        }
+    }
+
+    if (!ditemukan)
+        cout << "\n   [!] Tidak ada data penyewa saat ini.\n";
+
+    jedaTampilan();
+}
+
 void dashboardAdmin()
 {
     int subPilih = 0;
@@ -326,16 +373,11 @@ void dashboardAdmin()
     {
         bersihkanLayar();
         cout << "\n";
-        cout << "   ===============================================\n";
-        cout << "   |                                             |\n";
-        cout << "   |        D A S H B O A R D  A D M I N         |\n";
-        cout << "   |                                             |\n";
-        cout << "   ===============================================\n";
-        cout << setw(44) << "\033[36m[" << tanggal_sekarang << "]\033[0m\n";
+        printGoRent();
         cout << "   -----------------------------------------------\n";
-
-        string menu[] = {"Data Barang", "Konfirmasi Pengembalian", "Laporan Transaksi", "Logout"};
-        for (int i = 0; i < 4; i++)
+        cout << "                                      " << "\033[36m[" << tanggal_sekarang << "]\033[0m\n";
+        string menu[] = {"Data Barang", "Data Penyewa", "Konfirmasi Pengembalian", "Laporan Transaksi", "Logout"};
+        for (int i = 0; i < 5; i++)
         {
             cout << endl
                  << "            " << (i == subPilih ? "\033[36m>> " : "   ") << menu[i] << "\033[0m" << endl;
@@ -346,9 +388,9 @@ void dashboardAdmin()
         {
             key = _getch();
             if (key == 72)
-                subPilih = (subPilih == 0) ? 3 : subPilih - 1;
+                subPilih = (subPilih == 0) ? 4 : subPilih - 1;
             else if (key == 80)
-                subPilih = (subPilih == 3) ? 0 : subPilih + 1;
+                subPilih = (subPilih == 4) ? 0 : subPilih + 1;
         }
     } while (key != 13);
 
@@ -359,10 +401,14 @@ void dashboardAdmin()
         dashboardAdmin();
         break;
     case 1:
-        menuKonfirmasiPengembalian();
+        daftarPenyewa();
         dashboardAdmin();
         break;
     case 2:
+        menuKonfirmasiPengembalian();
+        dashboardAdmin();
+        break;
+    case 3:
         menuLaporanTransaksi();
         dashboardAdmin();
         break;

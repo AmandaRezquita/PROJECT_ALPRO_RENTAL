@@ -211,24 +211,56 @@ void lihatHistory()
 
 void menuProfil()
 {
-    bersihkanLayar();
-    cout << "\n   -----------------------------------------------\n";
-    cout << "   |             P R O F I L  U S E R            |\n";
-    cout << "   -----------------------------------------------\n";
-    cout << "   Username     : " << userList[user_id].akun.username << endl;
-    cout << "   -----------------------------------------------\n";
+    int subPilih = 0;
+    int key;
 
-    clearBuffer();
-    cout << "   Nama Lengkap : ";
-    getline(cin, userList[user_id].data.namaLengkap);
-    cout << "   No. Telepon  : ";
-    getline(cin, userList[user_id].data.noTelp);
-    cout << "   Alamat       : ";
-    getline(cin, userList[user_id].data.alamat);
+    do
+    {
+        bersihkanLayar();
+        cout << "\n   -----------------------------------------------\n";
+        cout << "   |             P R O F I L  U S E R            |\n";
+        cout << "   -----------------------------------------------\n";
+        cout << "   Username      : " << userList[user_id].akun.username << endl;
+        cout << "   Nama Lengkap  : " << (userList[user_id].data.profilLengkap ? userList[user_id].data.namaLengkap : "-") << endl;
+        cout << "   No. Telepon   : " << (userList[user_id].data.profilLengkap ? userList[user_id].data.noTelp : "-") << endl;
+        cout << "   Alamat        : " << (userList[user_id].data.profilLengkap ? userList[user_id].data.alamat : "-") << endl;
+        cout << "   -----------------------------------------------\n";
 
-    userList[user_id].data.profilLengkap = true;
-    cout << "\n   [OK] Profil berhasil disimpan!\n";
-    lanjutTampilan();
+        string menu[] = {"Edit Profil", "Kembali"};
+        for (int i = 0; i < 2; i++)
+        {
+            cout << endl
+                 << "   " << (i == subPilih ? "\033[36m>> " : "   ") << menu[i] << "\033[0m" << endl;
+        }
+        cout << "\n   -----------------------------------------------\n";
+
+        key = _getch();
+        if (key == 224)
+        {
+            key = _getch();
+            if (key == 72 || key == 80)
+                subPilih = (subPilih == 0) ? 1 : 0;
+        }
+    } while (key != 13);
+
+    if (subPilih == 0)
+    {
+        clearBuffer();
+        cout << "\n   Nama Lengkap : ";
+        getline(cin, userList[user_id].data.namaLengkap);
+        cout << "   No. Telepon  : ";
+        getline(cin, userList[user_id].data.noTelp);
+        cout << "   Alamat       : ";
+        getline(cin, userList[user_id].data.alamat);
+
+        userList[user_id].data.profilLengkap = true;
+        cout << "\n   [OK] Profil berhasil disimpan!\n";
+        jedaTampilan();
+    }
+    else
+    {
+        jedaTampilan();
+    }
 }
 
 void ajukanPengembalian()
@@ -283,11 +315,8 @@ void dashboardUser()
     {
         bersihkanLayar();
         cout << "\n";
-        cout << "   ===============================================\n";
-        cout << "   |                                             |\n";
-        cout << "   |          D A S H B O A R D  U S E R         |\n";
-        cout << "   |                                             |\n";
-        cout << "   ===============================================\n";
+        printGoRent();
+        cout << "   -----------------------------------------------\n";
         cout << "   \033[36m[Selamat datang : " << userList[user_id].akun.username << "]\033[0m\n";
         cout << "   -----------------------------------------------\n";
         cout << "                                      " << "\033[36m[" << tanggal_sekarang << "]\033[0m\n";

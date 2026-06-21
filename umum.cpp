@@ -87,6 +87,22 @@ string tempJenis, tempMerk, tempDeskripsi;
 extern int jumlahRiwayat;
 extern Transaksi riwayatTransaksi[100];
 
+void printGoRent() {
+   const string warna = "\033[1;36m";
+    const string reset = "\033[0m";
+
+cout << warna << R"(
+  /$$$$$$   /$$$$$$  /$$$$$$$                        /$$    
+ /$$__  $$ /$$__  $$| $$__  $$                      | $$    
+| $$  \__/| $$  \ $$| $$  \ $$  /$$$$$$  /$$$$$$$  /$$$$$$ 
+| $$ /$$$$| $$  | $$| $$$$$$$/ /$$__  $$| $$__  $$|_  $$_/ 
+| $$|_  $$| $$  | $$| $$__  $$| $$$$$$$$| $$  \ $$  | $$   
+| $$  \ $$| $$  | $$| $$  \ $$| $$_____/| $$  | $$  | $$ /$$
+|  $$$$$$/|  $$$$$$/| $$  | $$|  $$$$$$$| $$  | $$  |  $$$$/ 
+ \______/  \______/ |__/  |__/ \_______/|__/  |__/   \___/  
+    )" << reset << endl;
+}
+
 void tampilkanLoading()
 {
     string frame = "/-\\|";
@@ -136,8 +152,7 @@ void inisialisasiDummyData()
 
 void clearBuffer()
 {
-    cin.clear();
-    cin.ignore(MAX, '\n');
+    cin.ignore(1000, '\n');
 }
 
 void spasi()
@@ -170,7 +185,7 @@ void dataAwal()
     admin[0].password = "admin123";
     userList[0].akun.username = "user1";
     userList[0].akun.password = "123";
-    userList[0].data.profilLengkap = false; 
+    userList[0].data.profilLengkap = false;
 
     userList[1].akun.username = "user2";
     userList[1].akun.password = "456";
@@ -401,10 +416,10 @@ void menuUtama()
         cout << endl;
         tampilkanVespa();
         cout << '\n';
-        cout << "     ===========================================================\n";
+        cout << "     ==========================================================\n";
         cout << endl;
-        cout << "       ";
-        cout << "      S I S T E M  R E N T A L  K E N D A R A A N      \n";
+        cout << "     ";
+        cout << " G O R E N T  S I S T E M  R E N T A L  K E N D A R A A N      \n";
         string menu[] = {"Login", "Registrasi", "Keluar"};
         for (int i = 0; i < 3; i++)
         {
@@ -462,12 +477,17 @@ void menuFilterBarang()
     string fJenis, fMerk;
     int hMin = 0, hMax = 99999999;
 
-    cetakHeaderFilter("", "");
+    bersihkanLayar();
+    cout << "\n";
+    cout << "   -----------------------------------------------\n";
+    cout << "   |          F I L T E R  B A R A N G           |\n";
+    cout << "   -----------------------------------------------\n";
+
     clearBuffer();
 
     do
     {
-        cout << "\n   Masukkan Jenis (Motor/Mobil) : ";
+        cout << "   Masukkan Jenis (Motor/Mobil) : ";
         getline(cin, fJenis);
         if (fJenis == "motor" || fJenis == "Motor" || fJenis == "MOTOR")
         {
@@ -479,20 +499,19 @@ void menuFilterBarang()
             fJenis = "Mobil";
             break;
         }
-        cout << "   [Input Salah! Masukkan Motor atau Mobil]\n\n";
+        cout << "   \033[31m[!] Input salah! Masukkan Motor atau Mobil\033[0m\n";
     } while (true);
 
-    cout << endl;
     while (true)
     {
-        cout << "   Masukkan Merk (Honda/dll)    : ";
+        cout << "   Masukkan Merk (Honda)        : ";
         getline(cin, fMerk);
         if (fMerk == "honda" || fMerk == "Honda" || fMerk == "HONDA")
         {
             fMerk = "Honda";
             break;
         }
-        cout << "   [Input Salah! Hanya tersedia merk Honda]\n\n";
+        cout << "   \033[31m[!] Merk tidak tersedia!\033[0m\n";
     }
 
     const int TOTAL_MENU = 4;
@@ -506,15 +525,14 @@ void menuFilterBarang()
 
     do
     {
-        cetakHeaderFilter(fJenis, fMerk);
-        cout << "\tPilih Rentang Harga Per Hari (Gunakan Panah + ENTER):\n";
-
+        bersihkanLayar();
+        cout << "\n";
+        cout << "   -----------------------------------------------" << endl;
+        cout << "   |        PILIH RENTANG HARGA PER HARI         |" << endl;
+        cout << "   -----------------------------------------------" << endl;
         for (int i = 0; i < TOTAL_MENU; i++)
         {
-            if (i == pilihHarga)
-                cout << "\t\033[36m>> " << menuHarga[i] << "\033[0m\n";
-            else
-                cout << "\t   " << menuHarga[i] << "\n";
+            cout << (i == pilihHarga ? "   \033[36m>> " : "      ") << menuHarga[i] << "\033[0m" << endl;
         }
 
         key = _getch();
@@ -549,29 +567,35 @@ void menuFilterBarang()
     }
 
     bersihkanLayar();
-    cout << "\n   ==================== HASIL FILTER ====================\n\n";
+    cout << "\n   -----------------------------------------------" << endl;
+    cout << "   |             HASIL FILTER BARANG             |" << endl;
+    cout << "   -----------------------------------------------" << endl;
+
     bool ditemukan = false;
     int nomor = 1;
 
     for (int i = 0; i < jumlahBarang; i++)
     {
-        if ((daftarBarang[i].deskripsi.find(fJenis) <= daftarBarang[i].deskripsi.length()) &&
-            (daftarBarang[i].deskripsi.find(fMerk) <= daftarBarang[i].deskripsi.length()) &&
+        if ((daftarBarang[i].deskripsi.find(fJenis) != string::npos) &&
+            (daftarBarang[i].deskripsi.find(fMerk) != string::npos) &&
             (daftarBarang[i].harga >= hMin && daftarBarang[i].harga <= hMax))
         {
-            cout << "\n   " << i + 1 << ". Nama       : " << daftarBarang[i].nama << endl;
+            cout << "   " << nomor << ". Nama       : " << daftarBarang[i].nama << endl;
             cout << "\n      Harga      : Rp" << daftarBarang[i].harga << endl;
             cout << "\n      Status     : " << (daftarBarang[i].available ? "Tersedia" : "Sedang Disewa") << endl;
             cout << "\n      Deskripsi  : " << daftarBarang[i].deskripsi << endl;
             cout << "\n      " << BLUE << "\033]8;;" << daftarBarang[i].url << "\033\\Foto Produk\033]8;;\033\\" << RESET << endl;
-            cout << "\n   -----------------------------------------------" << endl;
+            cout << "   -----------------------------------------------" << endl;
+            nomor++;
             ditemukan = true;
         }
     }
 
     if (!ditemukan)
-        cout << "\t     [ Tidak ada kendaraan yang cocok ]\n";
+        cout << "\n   \033[31m[!] Tidak ada kendaraan yang cocok dengan kriteria.\033[0m\n";
+
     jedaTampilan();
+    readBarang();
 }
 
 void bubbleSortHarga(bool ascending)
@@ -671,6 +695,67 @@ void menuSortirBarang()
     }
 
     jedaTampilan();
+    readBarang();
+}
+
+void cariBarang()
+{
+    bersihkanLayar();
+    string keyword;
+    cout << "\n   -----------------------------------------------\n";
+    cout << "   |             C A R I  B A R A N G            |\n";
+    cout << "   -----------------------------------------------\n";
+    cout << "   Masukkan nama barang yang dicari: ";
+    clearBuffer();
+    getline(cin, keyword);
+    cout << "   ===============================================\n";
+    cout << "   Hasil pencarian untuk: \"" << keyword << "\"\n";
+    cout << "   -----------------------------------------------\n";
+
+    bool ditemukan = false;
+    int nomor = 1;
+
+    for (int i = 0; i < jumlahBarang; i++)
+    {
+        string nama = daftarBarang[i].nama;
+        int n = nama.length();
+        int m = keyword.length();
+        bool cocok = false;
+
+        for (int j = 0; j <= n - m; j++)
+        {
+            int k;
+            for (k = 0; k < m; k++)
+            {
+                if (tolower(nama[j + k]) != tolower(keyword[k]))
+                    break;
+            }
+            if (k == m)
+            {
+                cocok = true;
+                break;
+            }
+        }
+
+        if (cocok)
+        {
+            cout << "   " << nomor << ". Nama      : " << daftarBarang[i].nama << endl;
+            cout << "\n      Harga      : Rp" << daftarBarang[i].harga << endl;
+            cout << "\n      Status     : " << (daftarBarang[i].available ? "Tersedia" : "Sedang Disewa") << endl;
+            cout << "\n      Deskripsi  : " << daftarBarang[i].deskripsi << endl;
+            cout << "\n      " << BLUE << "\033]8;;" << daftarBarang[i].url << "\033\\Foto Produk\033]8;;\033\\" << RESET << endl;
+            cout << "   -----------------------------------------------\n";
+
+            ditemukan = true;
+            nomor++;
+        }
+    }
+
+    if (!ditemukan)
+        cout << "\n   [!] Barang tidak ditemukan.\n";
+
+    jedaTampilan();
+    readBarang();
 }
 
 int main()
