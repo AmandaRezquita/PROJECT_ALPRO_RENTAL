@@ -10,7 +10,8 @@ using namespace std;
 
 const int MAX = 100;
 
-string getTanggalSekarang() {
+string getTanggalSekarang()
+{
     time_t now = time(0);
     tm *ltm = localtime(&now);
 
@@ -33,6 +34,20 @@ struct Account
     string password;
 };
 
+struct Profil
+{
+    string namaLengkap;
+    string noTelp;
+    string alamat;
+    bool profilLengkap = false;
+};
+
+struct User
+{
+    Account akun;
+    Profil data;
+};
+
 struct Barang
 {
     string url;
@@ -43,14 +58,29 @@ struct Barang
 };
 
 Account admin[1];
-Account user[MAX];
 Barang daftarBarang[MAX];
+User userList[MAX];
+int user_id = -1;
 int jumlahUser = 2;
 int pilihMenu = 0;
 int jumlahBarang = 0;
-int edit, user_id;
+int edit;
 char yesorno;
 string tempJenis, tempMerk, tempDeskripsi;
+
+void tampilkanLoading()
+{
+    string frame = "/-\\|";
+    for (int i = 0; i < 20; i++)
+    {
+        cout << "\r   [ " << frame[i % 4] << " ] Sedang memproses nota...";
+        for (long long j = 0; j < 1000000000; j++)
+            ;
+    }
+    cout << "\r   [ OK ] Nota berhasil diproses!             " << endl;
+    for (long long j = 0; j < 2000000000; j++)
+        ;
+}
 
 void dashboardAdmin();
 void dashboardUser();
@@ -119,10 +149,13 @@ void dataAwal()
 {
     admin[0].username = "admin";
     admin[0].password = "admin123";
-    user[0].username = "user1";
-    user[0].password = "123";
-    user[1].username = "user2";
-    user[1].password = "456";
+    userList[0].akun.username = "user1";
+    userList[0].akun.password = "123";
+    userList[0].data.profilLengkap = false; 
+
+    userList[1].akun.username = "user2";
+    userList[1].akun.password = "456";
+    userList[1].data.profilLengkap = false;
 }
 
 void tampilkanVespa()
@@ -151,7 +184,8 @@ bool cekUser(string u, string p)
 {
     for (int i = 0; i < jumlahUser; i++)
     {
-        if (u == user[i].username && p == user[i].password){
+        if (u == userList[i].akun.username && p == userList[i].akun.password)
+        {
             user_id = i;
             return true;
         }
@@ -165,7 +199,7 @@ bool cekUsername(string u)
         return true;
     for (int i = 0; i < jumlahUser; i++)
     {
-        if (u == user[i].username)
+        if (u == userList[i].akun.username)
             return true;
     }
     return false;
@@ -281,8 +315,8 @@ void registrasi()
         cin >> c;
         if (p == c)
         {
-            user[jumlahUser].username = u;
-            user[jumlahUser].password = p;
+            userList[jumlahUser].akun.username = u;
+            userList[jumlahUser].akun.password = p;
             jumlahUser++;
             cout << endl;
             cout << '\t' << "     ";
@@ -542,14 +576,13 @@ void menuSortirBarang()
 {
     int key;
     int pilihSortir = 0;
-    const int TOTAL_MENU = 3; 
-    
+    const int TOTAL_MENU = 3;
+
     string menu[] = {
-        "Harga Termurah -> Termahal ", 
-        "Harga Termahal -> Termurah ", 
-        "Kembali"
-    };
-    
+        "Harga Termurah -> Termahal ",
+        "Harga Termahal -> Termurah ",
+        "Kembali"};
+
     do
     {
         bersihkanLayar();
@@ -560,61 +593,65 @@ void menuSortirBarang()
         cout << endl;
         for (int i = 0; i < TOTAL_MENU; i++)
         {
-            if (i == pilihSortir) {
+            if (i == pilihSortir)
+            {
                 cout << "\t    \033[36m>> " << menu[i] << "\033[0m" << endl;
                 cout << endl;
-            } else {
+            }
+            else
+            {
                 cout << "\t       " << menu[i] << endl;
                 cout << endl;
             }
         }
-        key = _getch(); 
+        key = _getch();
 
-        if (key == 224) 
+        if (key == 224)
         {
-            key = _getch(); 
-            if (key == 72) 
-                pilihSortir = (pilihSortir == 0) ? TOTAL_MENU - 1 : pilihSortir - 1; 
-            else if (key == 80) 
+            key = _getch();
+            if (key == 72)
+                pilihSortir = (pilihSortir == 0) ? TOTAL_MENU - 1 : pilihSortir - 1;
+            else if (key == 80)
                 pilihSortir = (pilihSortir == TOTAL_MENU - 1) ? 0 : pilihSortir + 1;
         }
-        
-    } while (key != 13); 
 
-    
+    } while (key != 13);
+
     switch (pilihSortir)
     {
-        case 0:
-            bubbleSortHarga(true);  
-            break;
-        case 1:
-            bubbleSortHarga(false); 
-            break;
-        case 2:
-            return; 
+    case 0:
+        bubbleSortHarga(true);
+        break;
+    case 1:
+        bubbleSortHarga(false);
+        break;
+    case 2:
+        return;
     }
 
- 
     bersihkanLayar();
     cout << "\n";
     cout << "   -----------------------------------------------\n";
     cout << "   |          H A S I L  S O R T I R              \n";
     cout << "   -----------------------------------------------\n";
-    if (jumlahBarang == 0) {
+    if (jumlahBarang == 0)
+    {
         cout << "\t     [ Tidak ada kendaraan yang tersedia ]\n";
-    } else {
+    }
+    else
+    {
         for (int i = 0; i < jumlahBarang; i++)
         {
-   cout << "\n   " << i + 1 << ". Nama       : " << daftarBarang[i].nama << endl;
-    cout << "\n      Harga      : Rp" << daftarBarang[i].harga << endl;
-    cout << "\n      Status     : " << (daftarBarang[i].available ? "Tersedia" : "Sedang Disewa") << endl;
-    cout << "\n      Deskripsi  : " << daftarBarang[i].deskripsi << endl;
-    cout << "\n      " << BLUE << "\033]8;;" << daftarBarang[i].url << "\033\\Foto Produk\033]8;;\033\\" << RESET << endl;
-    cout << "\n   -----------------------------------------------" << endl;
+            cout << "\n   " << i + 1 << ". Nama       : " << daftarBarang[i].nama << endl;
+            cout << "\n      Harga      : Rp" << daftarBarang[i].harga << endl;
+            cout << "\n      Status     : " << (daftarBarang[i].available ? "Tersedia" : "Sedang Disewa") << endl;
+            cout << "\n      Deskripsi  : " << daftarBarang[i].deskripsi << endl;
+            cout << "\n      " << BLUE << "\033]8;;" << daftarBarang[i].url << "\033\\Foto Produk\033]8;;\033\\" << RESET << endl;
+            cout << "\n   -----------------------------------------------" << endl;
         }
     }
 
-    jedaTampilan(); 
+    jedaTampilan();
 }
 
 int main()
