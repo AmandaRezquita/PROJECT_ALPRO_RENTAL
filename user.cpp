@@ -292,7 +292,7 @@ void dashboardUser()
         cout << "   -----------------------------------------------\n";
         cout << "                                      " << "\033[36m[" << tanggal_sekarang << "]\033[0m\n";
 
-        string menu[] = {"Lihat Barang", "Sewa Barang", "Profil Saya", "Riwayat Sewa", "Ajukan Pengembalian", "Logout"};
+        string menu[] = {"Lihat Barang", "Profil Saya", "Sewa Barang", "Riwayat Sewa", "Ajukan Pengembalian", "Logout"};
         for (int i = 0; i < 6; i++)
         {
             cout << endl
@@ -317,6 +317,10 @@ void dashboardUser()
         dashboardUser();
         break;
     case 1:
+        menuProfil();
+        dashboardUser();
+        break;
+    case 2:
         if (!userList[user_id].data.profilLengkap)
         {
             cout << "\n   \033[31m[!] PERINGATAN: Profil belum lengkap!\033[0m\n";
@@ -328,10 +332,6 @@ void dashboardUser()
         {
             pilihBarangUntukDipesan();
         }
-        break;
-    case 2:
-        menuProfil();
-        dashboardUser();
         break;
     case 3:
         lihatHistory();
