@@ -1,14 +1,48 @@
 #include <iostream>
 #include <string>
-#include <cstdlib>
 #include <conio.h>
 #include <iomanip>
 #include <ctime>
-#define BLUE "\033[34m"
-#define RESET "\033[0m"
+#include <limits>
 using namespace std;
 
+#define BLUE "\033[34m"
+#define RED "\033[31m"
+#define GREEN "\033[32m"
+#define CYAN "\033[1;36m"
+#define RESET "\033[0m"
+
 const int MAX = 100;
+int user_id = -1;
+int jumlahUser = 2;
+int pilihMenu = 0;
+int jumlahBarang = 0;
+int edit;
+int jumlahRiwayat = 0;
+int subPilih_t = 0;
+char yesorno;
+
+void dashboardAdmin();
+void dashboardUser();
+void kelolaBarang();
+void createBarang();
+void readBarang(bool isAdmin);
+void pilih_Barang_Edit();
+void deleteBarang();
+void bersihkanLayar();
+void jedaTampilan();
+
+string getValidatedInput(string prompt) {
+    string input;
+    do {
+        cout << prompt;
+        getline(cin, input);
+        if (input.empty()) {
+            cout << RED << "   [!] Input tidak boleh kosong!" << RESET << endl;
+        }
+    } while (input.empty());
+    return input;
+}
 
 string getTanggalSekarang()
 {
@@ -77,21 +111,22 @@ struct Transaksi
 Account admin[1];
 Barang daftarBarang[MAX];
 User userList[MAX];
-int user_id = -1;
-int jumlahUser = 2;
-int pilihMenu = 0;
-int jumlahBarang = 0;
-int edit;
-char yesorno;
+Transaksi riwayatTransaksi[MAX];
 string tempJenis, tempMerk, tempDeskripsi;
-extern int jumlahRiwayat;
-extern Transaksi riwayatTransaksi[100];
 
-void printGoRent() {
-   const string warna = "\033[1;36m";
-    const string reset = "\033[0m";
+void printGoRentSmall()
+{
+    cout << CYAN;
+    cout << "       ___     ___         _               " << endl;
+    cout << "      / __|___| _ \\___ _ _| |_             " << endl;
+    cout << "     | (_ / _ \\   / -_) ' \\  _|  _   _   _ " << endl;
+    cout << "      \\___\\___/_|_\\___|_||_\\__| (_) (_) (_)" << endl;
+    cout << RESET << endl;
+}
 
-cout << warna << R"(
+void printGoRent()
+{
+    cout << CYAN << R"(
   /$$$$$$   /$$$$$$  /$$$$$$$                        /$$    
  /$$__  $$ /$$__  $$| $$__  $$                      | $$    
 | $$  \__/| $$  \ $$| $$  \ $$  /$$$$$$  /$$$$$$$  /$$$$$$ 
@@ -100,59 +135,14 @@ cout << warna << R"(
 | $$  \ $$| $$  | $$| $$  \ $$| $$_____/| $$  | $$  | $$ /$$
 |  $$$$$$/|  $$$$$$/| $$  | $$|  $$$$$$$| $$  | $$  |  $$$$/ 
  \______/  \______/ |__/  |__/ \_______/|__/  |__/   \___/  
-    )" << reset << endl;
-}
-
-void tampilkanLoading()
-{
-    string frame = "/-\\|";
-    for (int i = 0; i < 20; i++)
-    {
-        cout << "\r   [ " << frame[i % 4] << " ] Sedang memproses nota...";
-        for (long long j = 0; j < 1000000000; j++)
-            ;
-    }
-    cout << "\r   [ OK ] Nota berhasil diproses!             " << endl;
-    for (long long j = 0; j < 2000000000; j++)
-        ;
-}
-
-void dashboardAdmin();
-void dashboardUser();
-void kelolaBarang();
-void createBarang();
-void readBarang();
-void pilih_Barang_Edit();
-void deleteBarang();
-
-void inisialisasiDummyData()
-{
-    if (jumlahBarang == 0)
-    {
-        daftarBarang[0] = {
-            "https://kenh14cdn.com/203336854389633024/2022/11/28/photo-17-1669604198602829180940.jpg",
-            "Vario",
-            150000,
-            "Jenis     : Motor\n"
-            "                   Merk      : Honda\n"
-            "                   Catatan   : Tes",
-            true};
-
-        daftarBarang[1] = {
-            "https://www.honda.ca/-/media/Brands/Honda/Models/CR-V/2026/04-Trims/BAP/EX-L/SRSM/MY26_CR-V_EXL_AWD_SRSM_3250x2400_Desktop_BAPColourSelector_01.png",
-            "CRV",
-            250000,
-            "Jenis     : Mobil\n"
-            "                   Merk      : Honda\n"
-            "                   Catatan   : Tes",
-            true};
-        jumlahBarang = 2;
-    }
+    )" << RESET
+         << endl;
 }
 
 void clearBuffer()
 {
-    cin.ignore(1000, '\n');
+    cin.clear();
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
 }
 
 void spasi()
@@ -177,6 +167,45 @@ void lanjutTampilan()
 {
     cout << "\n>> Tekan ENTER untuk lanjut...";
     _getch();
+}
+
+void tampilkanLoading()
+{
+    string frame = "/-\\|";
+    for (int i = 0; i < 20; i++)
+    {
+        cout << "\r   [ " << frame[i % 4] << " ] Sedang memproses nota...";
+        for (long long j = 0; j < 1000000000; j++)
+            ;
+    }
+    cout << "\r   [ OK ] Nota berhasil diproses!             " << endl;
+    for (long long j = 0; j < 2000000000; j++)
+        ;
+}
+
+void inisialisasiDummyData()
+{
+    if (jumlahBarang == 0)
+    {
+        daftarBarang[0] = {
+            "https://kenh14cdn.com/203336854389633024/2022/11/28/photo-17-1669604198602829180940.jpg",
+            "Vario",
+            150000,
+            "Jenis     : Motor\n"
+            "                   Merk      : Honda\n"
+            "                   Catatan   : Tes",
+            true};
+
+        daftarBarang[1] = {
+            "https://www.honda.ca/-/media/Brands/Honda/Models/CR-V/2026/04-Trims/BAP/EX-L/SRSM/MY26_CR-V_EXL_AWD_SRSM_3250x2400_Desktop_BAPColourSelector_01.png",
+            "CRV",
+            250000,
+            "Jenis     : Mobil\n"
+            "                   Merk      : Honda\n"
+            "                   Catatan   : Tes",
+            true};
+        jumlahBarang = 2;
+    }
 }
 
 void dataAwal()
@@ -244,6 +273,7 @@ void loginAdmin()
     bersihkanLayar();
     string u, p;
     cout << endl;
+    printGoRentSmall();
     tampilkanVespa();
     cout << '\n';
     cout << "     ===========================================================\n";
@@ -262,7 +292,7 @@ void loginAdmin()
     {
         cout << endl;
         cout << '\t' << "     ";
-        cout << BLUE << "[Login Berhasil!]\n"
+        cout << GREEN << "[Login Berhasil!]\n"
              << RESET
              << endl;
         lanjutTampilan();
@@ -272,7 +302,8 @@ void loginAdmin()
     {
         cout << endl;
         cout << '\t' << "     ";
-        cout << "[Login Gagal!]\n"
+        cout << RED << "[Login Gagal!]\n"
+             << RESET
              << endl;
         jedaTampilan();
     }
@@ -283,6 +314,7 @@ void loginUser()
     bersihkanLayar();
     string u, p;
     cout << endl;
+    printGoRentSmall();
     tampilkanVespa();
     cout << '\n';
     cout << "     ===========================================================\n";
@@ -301,7 +333,7 @@ void loginUser()
     {
         cout << endl;
         cout << '\t' << "     ";
-        cout << BLUE << "[Login Berhasil!]\n"
+        cout << GREEN << "[Login Berhasil!]\n"
              << RESET << endl;
         lanjutTampilan();
         dashboardUser();
@@ -310,7 +342,8 @@ void loginUser()
     {
         cout << endl;
         cout << '\t' << "     ";
-        cout << "[Login Gagal!]\n"
+        cout << RED << "[Login Gagal!]\n"
+             << RESET
              << endl;
     }
     jedaTampilan();
@@ -321,6 +354,7 @@ void registrasi()
     bersihkanLayar();
     string u, p, c;
     cout << endl;
+    printGoRentSmall();
     tampilkanVespa();
     cout << '\n';
     cout << "     ===========================================================\n";
@@ -335,7 +369,7 @@ void registrasi()
     {
         cout << endl;
         cout << '\t' << "     ";
-        cout << "[Username sudah terdaftar!]\n";
+        cout << RED << "[Username sudah terdaftar!]" << RESET << endl;
     }
     else
     {
@@ -354,13 +388,15 @@ void registrasi()
             jumlahUser++;
             cout << endl;
             cout << '\t' << "     ";
-            cout << "[Akun berhasil dibuat!]\n";
+            cout << GREEN << "[Akun berhasil dibuat!]\n"
+                 << RESET;
         }
         else
         {
             cout << endl;
             cout << '\t' << "     ";
-            cout << "[Password tidak cocok!]\n";
+            cout << RED << "[Password tidak cocok!]\n"
+                 << RESET;
         }
     }
     jedaTampilan();
@@ -374,6 +410,7 @@ void loginSubMenu()
     {
         bersihkanLayar();
         cout << endl;
+        printGoRentSmall();
         tampilkanVespa();
         cout << '\n';
         cout << "     ===========================================================\n";
@@ -386,7 +423,7 @@ void loginSubMenu()
             cout << endl;
             cout << '\t' << "     ";
             if (i == subPilih)
-                cout << "\033[36m>> " << menu[i] << "\033[0m" << endl;
+                cout << BLUE << ">> " << menu[i] << RESET << endl;
             else
                 cout << "   " << menu[i] << endl;
         }
@@ -414,12 +451,13 @@ void menuUtama()
     {
         bersihkanLayar();
         cout << endl;
+        printGoRentSmall();
         tampilkanVespa();
         cout << '\n';
         cout << "     ==========================================================\n";
         cout << endl;
         cout << "     ";
-        cout << " G O R E N T  S I S T E M  R E N T A L  K E N D A R A A N      \n";
+        cout << "        S I S T E M  R E N T A L  K E N D A R A A N      \n";
         string menu[] = {"Login", "Registrasi", "Keluar"};
         for (int i = 0; i < 3; i++)
         {
@@ -427,7 +465,7 @@ void menuUtama()
             cout << '\t' << "     ";
 
             if (i == pilihMenu)
-                cout << "\033[36m>> " << menu[i] << "\033[0m" << endl;
+                cout << BLUE << ">> " << menu[i] << RESET << endl;
             else
                 cout << "   " << menu[i] << endl;
         }
@@ -477,42 +515,40 @@ void menuFilterBarang()
     string fJenis, fMerk;
     int hMin = 0, hMax = 99999999;
 
+    clearBuffer();
     bersihkanLayar();
+    printGoRent();
     cout << "\n";
     cout << "   -----------------------------------------------\n";
-    cout << "   |          F I L T E R  B A R A N G           |\n";
+    cout << "   |              F I L T E R  B A R A N G         |\n";
     cout << "   -----------------------------------------------\n";
-
-    clearBuffer();
 
     do
     {
         cout << "   Masukkan Jenis (Motor/Mobil) : ";
         getline(cin, fJenis);
-        if (fJenis == "motor" || fJenis == "Motor" || fJenis == "MOTOR")
+        string cekJenis = fJenis;
+        for (char &c : cekJenis)
+            c = tolower(c);
+
+        if (cekJenis == "motor")
         {
-            fJenis = "Motor";
+            fJenis = "motor";
             break;
         }
-        if (fJenis == "mobil" || fJenis == "Mobil" || fJenis == "MOBIL")
+        if (cekJenis == "mobil")
         {
-            fJenis = "Mobil";
+            fJenis = "mobil";
             break;
         }
-        cout << "   \033[31m[!] Input salah! Masukkan Motor atau Mobil\033[0m\n";
+        cout << RED << "   [!] Input salah! Masukkan Motor atau Mobil" << RESET << endl;
     } while (true);
 
-    while (true)
-    {
-        cout << "   Masukkan Merk (Honda)        : ";
-        getline(cin, fMerk);
-        if (fMerk == "honda" || fMerk == "Honda" || fMerk == "HONDA")
-        {
-            fMerk = "Honda";
-            break;
-        }
-        cout << "   \033[31m[!] Merk tidak tersedia!\033[0m\n";
-    }
+    cout << "   Masukkan Merk                : ";
+    getline(cin, fMerk);
+    string fMerkLower = fMerk;
+    for (char &c : fMerkLower)
+        c = tolower(c);
 
     const int TOTAL_MENU = 4;
     string menuHarga[TOTAL_MENU] = {
@@ -526,14 +562,17 @@ void menuFilterBarang()
     do
     {
         bersihkanLayar();
-        cout << "\n";
+        printGoRent();
+        cout << "\n   -----------------------------------------------" << endl;
+        cout << "   |         PILIH RENTANG HARGA PER HARI         |" << endl;
         cout << "   -----------------------------------------------" << endl;
-        cout << "   |        PILIH RENTANG HARGA PER HARI         |" << endl;
-        cout << "   -----------------------------------------------" << endl;
+        cout << endl;
         for (int i = 0; i < TOTAL_MENU; i++)
         {
-            cout << (i == pilihHarga ? "   \033[36m>> " : "      ") << menuHarga[i] << "\033[0m" << endl;
+            cout << (i == pilihHarga ? BLUE "           >> " : "              ") << menuHarga[i] << RESET << endl;
+            cout << endl;
         }
+        cout << "   ===============================================" << endl;
 
         key = _getch();
         if (key == 224 || key == -32)
@@ -567,6 +606,7 @@ void menuFilterBarang()
     }
 
     bersihkanLayar();
+    printGoRent();
     cout << "\n   -----------------------------------------------" << endl;
     cout << "   |             HASIL FILTER BARANG             |" << endl;
     cout << "   -----------------------------------------------" << endl;
@@ -576,26 +616,29 @@ void menuFilterBarang()
 
     for (int i = 0; i < jumlahBarang; i++)
     {
-        if ((daftarBarang[i].deskripsi.find(fJenis) != string::npos) &&
-            (daftarBarang[i].deskripsi.find(fMerk) != string::npos) &&
+        string descLower = daftarBarang[i].deskripsi;
+        for (char &c : descLower)
+            c = tolower(c);
+
+        if ((descLower.find(fJenis) != string::npos) &&
+            (descLower.find(fMerkLower) != string::npos) &&
             (daftarBarang[i].harga >= hMin && daftarBarang[i].harga <= hMax))
         {
-            cout << "   " << nomor << ". Nama       : " << daftarBarang[i].nama << endl;
+            cout << "   " << nomor++ << ". Nama      : " << daftarBarang[i].nama << endl;
             cout << "\n      Harga      : Rp" << daftarBarang[i].harga << endl;
             cout << "\n      Status     : " << (daftarBarang[i].available ? "Tersedia" : "Sedang Disewa") << endl;
             cout << "\n      Deskripsi  : " << daftarBarang[i].deskripsi << endl;
             cout << "\n      " << BLUE << "\033]8;;" << daftarBarang[i].url << "\033\\Foto Produk\033]8;;\033\\" << RESET << endl;
             cout << "   -----------------------------------------------" << endl;
-            nomor++;
             ditemukan = true;
         }
     }
 
     if (!ditemukan)
-        cout << "\n   \033[31m[!] Tidak ada kendaraan yang cocok dengan kriteria.\033[0m\n";
+        cout << RED << "\n   [!] Tidak ada kendaraan yang cocok dengan kriteria." << RESET << endl;
 
+    cin.clear();
     jedaTampilan();
-    readBarang();
 }
 
 void bubbleSortHarga(bool ascending)
@@ -625,10 +668,11 @@ void menuSortirBarang()
         "Harga Termurah -> Termahal ",
         "Harga Termahal -> Termurah ",
         "Kembali"};
-
+    clearBuffer();
     do
     {
         bersihkanLayar();
+        printGoRent();
         cout << "\n";
         cout << "   -----------------------------------------------\n";
         cout << "   |           S O R T I R  B A R A N G           |\n";
@@ -638,7 +682,7 @@ void menuSortirBarang()
         {
             if (i == pilihSortir)
             {
-                cout << "\t    \033[36m>> " << menu[i] << "\033[0m" << endl;
+                cout << BLUE << "\t    >> " << menu[i] << RESET << endl;
                 cout << endl;
             }
             else
@@ -647,6 +691,7 @@ void menuSortirBarang()
                 cout << endl;
             }
         }
+        cout << "   ===============================================\n";
         key = _getch();
 
         if (key == 224)
@@ -695,18 +740,18 @@ void menuSortirBarang()
     }
 
     jedaTampilan();
-    readBarang();
 }
 
 void cariBarang()
 {
+    clearBuffer();
     bersihkanLayar();
+    printGoRent();
     string keyword;
     cout << "\n   -----------------------------------------------\n";
     cout << "   |             C A R I  B A R A N G            |\n";
     cout << "   -----------------------------------------------\n";
     cout << "   Masukkan nama barang yang dicari: ";
-    clearBuffer();
     getline(cin, keyword);
     cout << "   ===============================================\n";
     cout << "   Hasil pencarian untuk: \"" << keyword << "\"\n";
@@ -753,9 +798,7 @@ void cariBarang()
 
     if (!ditemukan)
         cout << "\n   [!] Barang tidak ditemukan.\n";
-
     jedaTampilan();
-    readBarang();
 }
 
 int main()

@@ -1,11 +1,4 @@
 #include "admin.cpp"
-using namespace std;
-
-int jumlahRiwayat = 0;
-Transaksi riwayatTransaksi[100];
-int subPilih_t = 0;
-void bersihkanLayar();
-void jedaTampilan();
 
 int hitungHari(int h, int b, int t)
 {
@@ -18,6 +11,7 @@ void prosesPembayaran(Transaksi t)
     bool pembayaranBerhasil = false;
 
     bersihkanLayar();
+    printGoRent();
     cout << "\n   -----------------------------------------------\n";
     cout << "   |              P E M B A Y A R A N            |\n";
     cout << "   -----------------------------------------------\n";
@@ -36,8 +30,8 @@ void prosesPembayaran(Transaksi t)
         }
         else
         {
-            cout << "   [Error] Uang tidak cukup! Kekurangan: Rp "
-                 << (t.totalBayar - uangDibayar) << endl;
+            cout << RED << "   [Error] Uang tidak cukup! Kekurangan: Rp "
+                 << (t.totalBayar - uangDibayar) << RESET << endl;
             cout << "   Silakan masukkan jumlah yang benar.\n"
                  << endl;
         }
@@ -54,8 +48,7 @@ void prosesPembayaran(Transaksi t)
     riwayatTransaksi[jumlahRiwayat].dikembalikan = false;
 
     jumlahRiwayat++;
-    daftarBarang[subPilih_t].available = false;
-    cout << "\n   [OK] Transaksi berhasil disimpan ke riwayat!" << endl;
+    cout << GREEN << "\n   [OK] Transaksi berhasil disimpan ke riwayat!" << RESET << endl;
     lanjutTampilan();
     dashboardUser();
 }
@@ -63,6 +56,7 @@ void prosesPembayaran(Transaksi t)
 void cetakNota(Transaksi t)
 {
     bersihkanLayar();
+    printGoRent();
     cout << "   -----------------------------------------------\n";
     cout << "   |             N O T A  P E S A N A N          |\n";
     cout << "   -----------------------------------------------\n";
@@ -72,10 +66,30 @@ void cetakNota(Transaksi t)
     cout << "   -----------------------------------------------\n";
     cout << "   Durasi        : " << t.totalDurasi << " Hari" << endl;
     cout << "   Total Tagihan : Rp " << t.totalBayar << endl;
-    cout << "   -----------------------------------------------\n";
-    cout << "\n   Silahkan lanjutkan ke pembayaran\n";
+    cout << "   ===============================================\n";
+    cout << "   [ENTER] Lanjutkan Pembayaran | [ESC] Batalkan Pesanan\n";
 
-    lanjutTampilan();
+    char key;
+    do
+    {
+        key = _getch();
+        if (key == 27)
+        {
+            cout << RED << "\n   [!] Pesanan dibatalkan." << RESET << endl;
+            for (int i = 0; i < jumlahBarang; i++)
+            {
+                if (daftarBarang[i].nama == t.barang)
+                {
+                    daftarBarang[i].available = true;
+                    break;
+                }
+            }
+
+            jedaTampilan();
+            dashboardUser();
+            return;
+        }
+    } while (key != 13);
 }
 
 void prosesPesanan(string namaUser, Barang b)
@@ -93,6 +107,7 @@ void prosesPesanan(string namaUser, Barang b)
     t.tahunAwal = 1900 + ltm->tm_year;
 
     bersihkanLayar();
+    printGoRent();
     cout << "\n   -----------------------------------------------\n";
     cout << "   |          S E W A  K E N D A R A A N         |\n";
     cout << "   -----------------------------------------------\n";
@@ -123,14 +138,14 @@ void prosesPesanan(string namaUser, Barang b)
         {
             t.totalDurasi = selisih;
         }
-
         if (t.totalDurasi >= 1)
         {
             tanggalValid = true;
         }
         else
         {
-            cout << "   [Error] Tanggal tidak valid! Tanggal selesai tidak boleh sebelum tanggal mulai.\n"
+            cout << RED << "   [Error] Tanggal tidak valid! Tanggal selesai tidak boleh sebelum tanggal mulai.\n"
+                 << RESET
                  << endl;
         }
     } while (!tanggalValid);
@@ -145,38 +160,72 @@ void prosesPesanan(string namaUser, Barang b)
 void pilihBarangUntukDipesan()
 {
     int key;
+    int daftarTersedia[100];
+    int countTersedia = 0;
+
+    for (int i = 0; i < jumlahBarang; i++)
+    {
+        if (daftarBarang[i].available == true)
+        {
+            daftarTersedia[countTersedia] = i;
+            countTersedia++;
+        }
+    }
+
+    if (countTersedia == 0)
+    {
+        cout << RED << "\n   [!] Maaf, tidak ada barang yang tersedia saat ini." << RESET << endl;
+        jedaTampilan();
+        return;
+    }
+
+    int subPilih_t = 0;
 
     do
     {
         bersihkanLayar();
-        cout << "\n   -----------------------------------------------\n";
-        cout << "   |             S E W A  B A R A N G            |\n";
-        cout << "   -----------------------------------------------\n";
-        for (int i = 0; i < jumlahBarang; i++)
+        printGoRent();
+        cout << "\n   -----------------------------------------------" << endl;
+        cout << "   |          S E W A  K E N D A R A A N         |" << endl;
+        cout << "   -----------------------------------------------" << endl;
+        cout << endl;
+        for (int i = 0; i < countTersedia; i++)
         {
-            string penanda = (i == subPilih_t) ? "\033[36m>> " : "   ";
-            cout << "              " << penanda << left << setw(10) << daftarBarang[i].nama
-                 << "- Rp" << daftarBarang[i].harga << "\033[0m" << endl;
+            int idxAsli = daftarTersedia[i];
+            cout << (i == subPilih_t ? BLUE "           >> " : "              ")
+                 << left << setw(15) << daftarBarang[idxAsli].nama
+                 << "- Rp" << daftarBarang[idxAsli].harga << RESET << endl;
+            cout << endl;
         }
 
-        cout << "   ===============================================\n";
+        cout << "   ===============================================" << endl;
+        cout << "   [ENTER] Pilih | [ESC] Kembali" << endl;
 
         key = _getch();
-        if (key == 224)
+        if (key == 224 || key == -32)
         {
             key = _getch();
             if (key == 72)
-                subPilih_t = (subPilih_t == 0) ? jumlahBarang - 1 : subPilih_t - 1;
+                subPilih_t = (subPilih_t == 0) ? countTersedia - 1 : subPilih_t - 1;
             else if (key == 80)
-                subPilih_t = (subPilih_t == jumlahBarang - 1) ? 0 : subPilih_t + 1;
+                subPilih_t = (subPilih_t == countTersedia - 1) ? 0 : subPilih_t + 1;
+        }
+        else if (key == 27)
+        {
+            dashboardUser();
+            return;
         }
     } while (key != 13);
-    prosesPesanan(userList[user_id].akun.username, daftarBarang[subPilih_t]);
+
+    int pilihanAkhir = daftarTersedia[subPilih_t];
+    daftarBarang[pilihanAkhir].available = false;
+    prosesPesanan(userList[user_id].akun.username, daftarBarang[pilihanAkhir]);
 }
 
 void lihatHistory()
 {
     bersihkanLayar();
+    printGoRent();
     cout << "\n   -----------------------------------------------\n";
     cout << "   |            R I W A Y A T  S E W A           |\n";
     cout << "   -----------------------------------------------\n";
@@ -192,11 +241,11 @@ void lihatHistory()
             cout << "   Status     : ";
             if (!riwayatTransaksi[i].dikembalikan)
             {
-                cout << "\033[31m[BELUM DIKEMBALIKAN]\033[0m" << endl;
+                cout << RED << "[BELUM DIKEMBALIKAN]" << RESET << endl;
             }
             else
             {
-                cout << "\033[32m[SUDAH DIKEMBALIKAN]\033[0m" << endl;
+                cout << GREEN << "[SUDAH DIKEMBALIKAN]" << RESET << endl;
             }
 
             cout << "   -----------------------------------------------\n";
@@ -205,7 +254,7 @@ void lihatHistory()
     }
 
     if (!ada)
-        cout << "   Belum ada riwayat transaksi.\n";
+        cout << RED << "   [!] Belum ada riwayat transaksi." << RESET << endl;
     lanjutTampilan();
 }
 
@@ -217,6 +266,7 @@ void menuProfil()
     do
     {
         bersihkanLayar();
+        printGoRent();
         cout << "\n   -----------------------------------------------\n";
         cout << "   |             P R O F I L  U S E R            |\n";
         cout << "   -----------------------------------------------\n";
@@ -246,7 +296,7 @@ void menuProfil()
     if (subPilih == 0)
     {
         clearBuffer();
-        cout << "\n   Nama Lengkap : ";
+        cout << "   Nama Lengkap : ";
         getline(cin, userList[user_id].data.namaLengkap);
         cout << "   No. Telepon  : ";
         getline(cin, userList[user_id].data.noTelp);
@@ -254,7 +304,7 @@ void menuProfil()
         getline(cin, userList[user_id].data.alamat);
 
         userList[user_id].data.profilLengkap = true;
-        cout << "\n   [OK] Profil berhasil disimpan!\n";
+        cout << GREEN << "\n   [OK] Profil berhasil disimpan!" << RESET << endl;
         jedaTampilan();
     }
     else
@@ -265,48 +315,69 @@ void menuProfil()
 
 void ajukanPengembalian()
 {
-    bersihkanLayar();
-    cout << "\n   -----------------------------------------------\n";
-    cout << "   |     A J U K A N  P E N G E M B A L I A N    |\n";
-    cout << "   -----------------------------------------------\n";
-
     int indexDitemukan[100];
     int count = 0;
-
     for (int i = 0; i < jumlahRiwayat; i++)
     {
         if (riwayatTransaksi[i].pembeli == userList[user_id].akun.username &&
             !riwayatTransaksi[i].dikembalikan && !riwayatTransaksi[i].diajukan)
         {
-
-            cout << "   " << count + 1 << ". " << riwayatTransaksi[i].barang
-                 << " (ID: " << riwayatTransaksi[i].kode << ")" << endl;
             indexDitemukan[count] = i;
             count++;
         }
     }
-
     if (count == 0)
     {
-        cout << "\n   Tidak ada kendaraan yang perlu dikembalikan.\n";
+        bersihkanLayar();
+        printGoRent();
+        cout << "\n   -----------------------------------------------" << endl;
+        cout << "   |     A J U K A N  P E N G E M B A L I A N    |" << endl;
+        cout << "   -----------------------------------------------" << endl;
+        cout << RED <<"\n   [!] Tidak ada kendaraan yang perlu dikembalikan." << RESET << endl;
+        jedaTampilan();
+        return;
     }
-    else
+    int subPilih = 0;
+    char key;
+    do
     {
-        int pilih;
-        cout << "\n   Pilih nomor kendaraan yang ingin dikembalikan: ";
-        cin >> pilih;
-
-        if (pilih > 0 && pilih <= count)
+        bersihkanLayar();
+        printGoRent();
+        cout << "\n   -----------------------------------------------" << endl;
+        cout << "   |     A J U K A N  P E N G E M B A L I A N    |" << endl;
+        cout << "   -----------------------------------------------" << endl;
+        cout << endl;
+        for (int i = 0; i < count; i++)
         {
-            int targetIdx = indexDitemukan[pilih - 1];
-            riwayatTransaksi[targetIdx].diajukan = true;
-
-            cout << "\n   [OK] Pengajuan berhasil dikirim!\n";
-            cout << "   Mohon tunggu admin memproses verifikasi Anda.\n";
+            int idx = indexDitemukan[i];
+            cout << (i == subPilih ? BLUE "   >> " : "      ")
+                 << riwayatTransaksi[idx].barang << " (ID: "
+                 << riwayatTransaksi[idx].kode << ")" << RESET << endl;
         }
-    }
-    lanjutTampilan();
+        cout << "\n   ===============================================" << endl;
+        cout << "   [ENTER] Ajukan | [ESC] Kembali" << endl;
+        key = _getch();
+        if (key == 224 || key == -32)
+        {
+            key = _getch();
+            if (key == 72)
+                subPilih = (subPilih == 0) ? count - 1 : subPilih - 1;
+            else if (key == 80)
+                subPilih = (subPilih == count - 1) ? 0 : subPilih + 1;
+        }
+        else if (key == 27)
+            return;
+
+    } while (key != 13);
+
+    int targetIdx = indexDitemukan[subPilih];
+    riwayatTransaksi[targetIdx].diajukan = true;
+
+    cout << GREEN << "\n   [OK] Pengajuan berhasil dikirim!" << RESET << endl;
+    cout << "\n   [!] Mohon tunggu admin memproses verifikasi Anda.\n";
+    jedaTampilan();
 }
+
 void dashboardUser()
 {
     int subPilih = 0;
@@ -317,15 +388,15 @@ void dashboardUser()
         cout << "\n";
         printGoRent();
         cout << "   -----------------------------------------------\n";
-        cout << "   \033[36m[Selamat datang : " << userList[user_id].akun.username << "]\033[0m\n";
+        cout << CYAN << "   [Selamat datang : " << userList[user_id].akun.username << "]" << RESET << endl;
         cout << "   -----------------------------------------------\n";
-        cout << "                                      " << "\033[36m[" << tanggal_sekarang << "]\033[0m\n";
+        cout << "                                      " << GREEN << "[" << tanggal_sekarang << "]" << RESET << endl;
 
-        string menu[] = {"Lihat Barang", "Profil Saya", "Sewa Barang", "Riwayat Sewa", "Ajukan Pengembalian", "Logout"};
+        string menu[] = {"Lihat Barang", "Profil Saya", "Sewa Kendaraan", "Riwayat Sewa", "Ajukan Pengembalian", "Logout"};
         for (int i = 0; i < 6; i++)
         {
             cout << endl
-                 << "              " << (i == subPilih ? "\033[36m>> " : "   ") << menu[i] << "\033[0m" << endl;
+                 << "              " << (i == subPilih ? BLUE ">> " : "   ") << menu[i] << RESET << endl;
         }
         cout << "\n   ===============================================\n";
         key = _getch();
@@ -342,7 +413,7 @@ void dashboardUser()
     switch (subPilih)
     {
     case 0:
-        readBarang();
+        readBarang(false);
         dashboardUser();
         break;
     case 1:
@@ -352,7 +423,7 @@ void dashboardUser()
     case 2:
         if (!userList[user_id].data.profilLengkap)
         {
-            cout << "\n   \033[31m[!] PERINGATAN: Profil belum lengkap!\033[0m\n";
+            cout << RED << "   [!] PERINGATAN: Profil belum lengkap!" << RESET << endl;
             cout << "   Harap isi profil melalui menu 'Profil Saya' sebelum menyewa.\n";
             lanjutTampilan();
             dashboardUser();
@@ -376,7 +447,7 @@ void dashboardUser()
 
         if (yesorno == 'y' || yesorno == 'Y')
         {
-            cout << "\n   [Logout berhasil!]" << endl;
+            cout << GREEN << "\n   [Logout berhasil!]" << RESET << endl;
             lanjutTampilan();
             menuUtama();
         }
